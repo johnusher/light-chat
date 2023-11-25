@@ -17,7 +17,7 @@ const (
 	apiEndpoint = "https://api.openai.com/v1/chat/completions"
 )
 
-func main() {
+func mainx() {
 
 	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load my secret chatgpt apiKey
 	if err != nil {
@@ -58,7 +58,7 @@ func main() {
 
 	prompt := []interface{}{map[string]interface{}{"role": "user", "content": "Here is an example C code for an Arduino using the FastLED library to create a christmas effect on an LED strip: ."},
 		map[string]interface{}{"role": "user", "content": duinoExamplePromptStr},
-		map[string]interface{}{"role": "user", "content": "please update the code to make it look like disco lights flashing at 120 beats-per-minute"}}
+		map[string]interface{}{"role": "user", "content": "please update the code to make it look like disco lights flashing at 120 beats-per-minute. Please providing a response in C code."}}
 
 	response, err := client.R().
 		SetAuthToken(apiKey).

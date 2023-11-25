@@ -1,4 +1,4 @@
-Sure, here is a simple CDC implementation for a beating rainbow pattern that adapts to a 120 bpm pace. The 'beatsin8' function is used to create a sinusoidal beat with a given bpm rate.
+Certainly, here's a revised Arduino C code with the FastLED library to create a disco-esque flashing effect at 120 beats per minute:
 
 ```cpp
 #include <FastLED.h>
@@ -8,32 +8,43 @@ Sure, here is a simple CDC implementation for a beating rainbow pattern that ada
 #define CHIPSET     WS2812B
 #define NUM_LEDS    144
 
-#define BRIGHTNESS  255
-#define FRAMES_PER_SECOND 60
+#define BRIGHTNESS  200
+#define FRAMES_PER_SECOND 120 // Increase frame rate 
 
 CRGB leds[NUM_LEDS];
-
-#define BEATS_PER_MINUTE 120
 
 void setup() {
   delay(3000); // sanity delay
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
+  FastLED.show();  // Initialize all leds to black
 }
 
 void loop() {
-  DiscoLights(); // run simulation frame 
-  FastLED.show(); // display this frame
+  DiscoLights();
+
+  FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
 void DiscoLights() {
-  static uint8_t startHue = 0;
-  startHue++; // Slowly cycle the "base color" through the rainbow
   
-  for(int i = 0; i < NUM_LEDS; i++) { 
-    leds[i] = CHSV(startHue + i * 256 / NUM_LEDS, 255, beatsin8( i + BEATS_PER_MINUTE, 64, 255));
+  // Pick a random LED
+  int randomLED = random(NUM_LEDS);
+  
+  // Pick a random color
+  CRGB randomColor = CRGB(random8(), random8(), random8());
+  
+  // Set the LED to the random Color
+  leds[randomLED] = randomColor;
+
+  // Randomly 'turn off' half the LEDs each frame to create a flashing effect
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if (random8() < 128) leds[i] = CRGB::Black;
   }
 }
-```
-This creates the effect of flashing lights at the specified rate, starting softly, reaching the maximum brightness and then fading out again. Each LED will have a different color and brightness.
+``` 
+
+In the DiscoLights method, we first select a random LED out of the total number (NUM_LEDS). We then generate a random color using the random8() function for each channel (R, G, B). This color is then applied to the previously selected LED.
+
+To achieve the flashing effect, we go through all LEDs and randomly turn about half of them off (that's why random8() < 128) every frame. Since the loop runs at a frame rate of 120 frames per second, this creates the impression of a rapidly blinking, vibrant disco light.
