@@ -1,0 +1,39 @@
+Sure, here is a simple CDC implementation for a beating rainbow pattern that adapts to a 120 bpm pace. The 'beatsin8' function is used to create a sinusoidal beat with a given bpm rate.
+
+```cpp
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    144
+
+#define BRIGHTNESS  255
+#define FRAMES_PER_SECOND 60
+
+CRGB leds[NUM_LEDS];
+
+#define BEATS_PER_MINUTE 120
+
+void setup() {
+  delay(3000); // sanity delay
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  DiscoLights(); // run simulation frame 
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void DiscoLights() {
+  static uint8_t startHue = 0;
+  startHue++; // Slowly cycle the "base color" through the rainbow
+  
+  for(int i = 0; i < NUM_LEDS; i++) { 
+    leds[i] = CHSV(startHue + i * 256 / NUM_LEDS, 255, beatsin8( i + BEATS_PER_MINUTE, 64, 255));
+  }
+}
+```
+This creates the effect of flashing lights at the specified rate, starting softly, reaching the maximum brightness and then fading out again. Each LED will have a different color and brightness.
