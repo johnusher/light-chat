@@ -14,10 +14,10 @@ import (
 // 100 tokens ~= 75 words
 
 const (
-	apiEndpoint = "https://api.openai.com/v1/chat/completions"
+	apiEndpointtts = "https://api.openai.com/v1/chat/completions"
 )
 
-func mainxxxx() {
+func mainxxx() {
 
 	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load my secret chatgpt apiKey
 	if err != nil {
@@ -64,17 +64,29 @@ func mainxxxx() {
 		SetAuthToken(apiKey).
 		SetHeader("Content-Type", "application/json").
 		SetBody(map[string]interface{}{
-			// "model": "gpt-3.5-turbo",
-			"model":    "gpt-4",
+			"model": "gpt-3.5-turbo",
+			// "model":    "gpt-4",
 			"messages": prompt,
 			// "max_tokens": 50,
 			// "max_tokens": null,
 		}).
-		Post(apiEndpoint)
+		Post(apiEndpointtts)
 
 	if err != nil {
 		log.Fatalf("Error while sending send the request: %v", err)
 	}
+
+	// resp, err := client.CreateTranscription(
+	// 	context.Background(),
+	// 	openai.AudioRequest{
+	// 		Model:    openai.Whisper1,
+	// 		FilePath: os.Args[1],
+	// 	},
+	// )
+	// if err != nil {
+	// 	fmt.Printf("Transcription error: %v\n", err)
+	// 	return
+	// }
 
 	body := response.Body()
 

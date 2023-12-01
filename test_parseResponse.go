@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func main() {
+func mainx() {
 
 	response, err := os.ReadFile("response.txt") // saved response from chatgpt
 	if err != nil {
