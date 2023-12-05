@@ -97,7 +97,7 @@ func main() {
 		Content: duinoExamplePromptStr,
 	})
 
-	// log.Printf(req2.Messages.json:Content)   // how do i print this??
+	log.Printf("%+v\n", req2.Messages) // how do i print this??
 	// var req2 openai.ChatCompletionRequest
 	// look at https://pkg.go.dev/github.com/sashabaranov/go-openai@v1.17.9#section-readme
 
