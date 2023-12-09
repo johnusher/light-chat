@@ -1,5 +1,7 @@
 package main
 
+// voice light control
+
 // 1.read in mp3
 // 2. convert speech to text using online chatgpt whisper api
 // 3. create new prompt to change lights according to speech desire
@@ -11,12 +13,28 @@ import (
 	"log"
 	"os"
 
+	"github.com/johnusher/light-chat/pkg/keyboard"
+
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func xxmain() {
+func main() {
 
 	log.Printf(" starting ...")
+
+	// Setup keyboard input:
+	// stop := make(chan os.Signal, 1)
+	// signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	keys := make(chan rune)
+
+	kb, err := keyboard.Init(keys)
+	if err != nil {
+		// log.Errorf("failed to initialize keyboard: %s", err)
+		fmt.Print(err)
+		return
+	}
+
 	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load my secret chatgpt apiKey
 	if err != nil {
 		fmt.Print(err)
@@ -97,7 +115,7 @@ func xxmain() {
 		Content: duinoExamplePromptStr,
 	})
 
-	log.Printf("prompt : %+v\n", req2.Messages) // how do i print this??
+	// log.Printf("prompt : %+v\n", req2.Messages) // how do i print this??
 	// var req2 openai.ChatCompletionRequest
 	// look at https://pkg.go.dev/github.com/sashabaranov/go-openai@v1.17.9#section-readme
 
@@ -132,4 +150,39 @@ func xxmain() {
 		return
 	}
 
+	//-----------
+	// go forth
+	go kb.Run()
+
+	errs := make(chan error)
+
+	go func() {
+		errs <- VoliLoop(keys)
+	}()
+
+	// block until ctrl-c or one of the loops returns an error
+	select {
+	case <-errs:
+	}
+
+}
+
+func VoliLoop(keys <-chan rune) error {
+
+	// more := false
+	for {
+
+		select {
+
+		case _, more := <-keys:
+			// received local key press
+			// todo: replace/ augment this with a GPIO button press
+
+			if !more {
+				log.Printf("keyboard listener closed, exiting...")
+				return nil
+			}
+
+		}
+	}
 }
