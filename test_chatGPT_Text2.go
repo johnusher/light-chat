@@ -6,20 +6,26 @@ package main
 // 4. send new prompt to chatgpt and generate arduinno code
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"runtime"
+	"strings"
 
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func xxmain() {
+func main() {
 
 	log.Printf(" starting ...")
+
 	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load my secret chatgpt apiKey
 	if err != nil {
 		fmt.Print(err)
+		os.Exit(3)
 	}
 	str := string(secretAPI) // convert content to a 'string'
 	// fmt.Println(str) // print my secret chatgpt apiKey
@@ -27,9 +33,13 @@ func xxmain() {
 
 	// load example duno code for prompt:
 
-	duinoExamplePrompt, err := os.ReadFile("duinoCode//xmasTwinkleDuino.c")
+	// duinoExamplePrompt, err := os.ReadFile("xmasTwinkleDuino.c")
+	duinoExamplePrompt, err := os.ReadFile("duinoCode//duinoCode.ino")
+
 	if err != nil {
 		fmt.Print(err)
+		os.Exit(3)
+
 	}
 
 	duinoExamplePromptStr := string(duinoExamplePrompt)
@@ -42,8 +52,8 @@ func xxmain() {
 	ctx := context.Background()
 	//--------------------
 	// 1.read in mp3
-	audioFn := "audio//moreMoody.mp3"
-
+	// audioFn := "audio//moreMoody.mp3"
+	audioFn := "audio//blue.mp3"
 	req := openai.AudioRequest{
 		Model:    openai.Whisper1,
 		FilePath: audioFn,
@@ -97,7 +107,7 @@ func xxmain() {
 		Content: duinoExamplePromptStr,
 	})
 
-	log.Printf("prompt : %+v\n", req2.Messages) // how do i print this??
+	// log.Printf("prompt : %+v\n", req2.Messages) // how do i print this??
 	// var req2 openai.ChatCompletionRequest
 	// look at https://pkg.go.dev/github.com/sashabaranov/go-openai@v1.17.9#section-readme
 
@@ -113,13 +123,42 @@ func xxmain() {
 	// fmt.Println(resp.Choices[0].Message.Content)
 
 	responseContent := resp2.Choices[0].Message.Content
+	str = string(responseContent) // convert content to a 'string'
 
-	f, err := os.Create("response2.txt")
+	fmt.Println(str)
+
+	char := "#include <FastLED.h>" // assume this is first line of C!
+
+	index := strings.Index(str, char)
+	fmt.Println(index)
+	if index == -1 {
+		fmt.Printf("Character '%s' not found in the string.\n", char)
+		return
+	}
+	trimmedStr := str[index:]
+
+	// fmt.Println(trimmedStr)
+	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
+
+	char = "```"
+
+	index2 := strings.Index(trimmedStr, char)
+
+	// fmt.Println(index2)
+
+	if index2 > 0 {
+		trimmedStr = trimmedStr[:index2]
+		fmt.Printf("index2: %v\n", index2)
+	}
+
+	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
+
+	f, err := os.Create("duinoCode//duinoCode.ino")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	l, err := f.WriteString(responseContent)
+	l, err := f.WriteString(trimmedStr)
 	if err != nil {
 		fmt.Println(err)
 		f.Close()
@@ -130,6 +169,46 @@ func xxmain() {
 	if err != nil {
 		fmt.Println(err)
 		return
+	}
+
+	var c *exec.Cmd
+	if runtime.GOOS == "windows" {
+		c = exec.Command("arduino-cli.exe", "compile", "--fqbn", "arduino:avr:diecimila:cpu=atmega328", "duinoCode\\duinoCode.ino")
+		fmt.Println(c)
+
+		var out bytes.Buffer
+		var stderr bytes.Buffer
+		c.Stdout = &out
+		c.Stderr = &stderr
+
+		err := c.Run()
+		if err != nil {
+			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+			return
+		}
+		fmt.Println("Result: " + out.String())
+
+		c = exec.Command("arduino-cli.exe", "upload", "-p", "COM5", "-b", "arduino:avr:diecimila:cpu=atmega328", "duinoCode\\duinoCode.ino", "-v")
+
+		// var out bytes.Buffer
+		// var stderr bytes.Buffer
+		c.Stdout = &out
+		c.Stderr = &stderr
+
+		fmt.Println(c)
+
+		err = c.Run()
+		if err != nil {
+			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+			return
+		}
+		fmt.Println("Result: " + out.String())
+		// if err := c.Run(); err != nil {
+		// 	fmt.Println("Error: ", err)
+		// }
+
+		os.Exit(3)
+
 	}
 
 }

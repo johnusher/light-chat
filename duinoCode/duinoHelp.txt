@@ -1,0 +1,58 @@
+https://arduino.github.io/arduino-cli/0.21/getting-started/
+
+
+1. compile
+cd C:\Users\john\Dropbox\code\github\light-chat\duinoCode
+
+./arduino-cli compile --fqbn arduino:avr:diecimila:cpu=atmega328 .\duinoCode.ino
+
+./arduino-cli core update-index
+
+2. upload 
+
+arduino-cli.exe upload -p COM5 --fqbn arduino:avr:diecimila:cpu=atmega328 duinoCode\\duinoCode.ino" -v
+
+
+
+
+
+
+----------------------
+
+
+Connect the board to your PC¶
+The first thing to do upon a fresh install is to update the local cache of available platforms and libraries by running:
+
+
+$ arduino-cli core update-index
+
+./arduino-cli board list
+./arduino-cli board listall mkr
+
+./arduino-cli.exe core install arduino:avr
+
+
+./arduino-cli compile --fqbn arduino:avr:diecimila:cpu=atmega328 xmasTwinkleDuino.ino
+
+
+./arduino-cli compile --fqbn arduino:avr:diecimila:cpu=atmega328 
+
+Now verify we have installed the core properly by running:
+
+
+./arduino-cli core list
+
+
+in duino_src:
+
+compile and flash:
+Uno:
+arduino-cli compile --fqbn arduino:avr:uno duino_src
+
+arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno duino_src
+
+
+
+./arduino-cli upload -p COM5 --fqbn arduino:avr:uno duino_src.ino
+
+arduino-cli.exe upload -p COM5 --fqbn arduino:avr:uno 
