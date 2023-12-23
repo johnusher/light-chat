@@ -53,7 +53,7 @@ func main() {
 	//--------------------
 	// 1.read in mp3
 	// audioFn := "audio//moreMoody.mp3"
-	audioFn := "audio//blue.mp3"
+	audioFn := "audio//kafka.mp3"
 	req := openai.AudioRequest{
 		Model:    openai.Whisper1,
 		FilePath: audioFn,
@@ -71,7 +71,8 @@ func main() {
 	//--------------------
 
 	req2 := openai.ChatCompletionRequest{
-		Model: openai.GPT3Dot5Turbo,
+		// Model: openai.GPT3Dot5Turbo,
+		Model: openai.GPT4,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleUser,
