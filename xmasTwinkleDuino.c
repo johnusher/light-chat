@@ -3,10 +3,10 @@
 #define LED_PIN     6
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B
-#define NUM_LEDS    144
+#define NUM_LEDS    30
 
 #define BRIGHTNESS  200
-#define FRAMES_PER_SECOND 30
+#define FRAMES_PER_SECOND 20
 
 CRGB leds[NUM_LEDS];
 
