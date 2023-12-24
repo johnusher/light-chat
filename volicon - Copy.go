@@ -18,7 +18,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func mainyyyy() {
+func mainxxx() {
 
 	log.Printf(" starting ...")
 
