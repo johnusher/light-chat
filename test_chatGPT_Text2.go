@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -52,19 +53,46 @@ func main() {
 
 	log.Printf(" starting lightChat3000")
 
+	resetChat := flag.Bool("r", false, "reset chat history to xmas example")
+
+	flag.Parse()
+
+	var duinoExamplePrompt []byte
+
+	var err error
+
 	// load example duno code for prompt:
 
-	duinoExamplePrompt, err := os.ReadFile("xmasTwinkleDuino.c")
-	// duinoExamplePrompt, err := os.ReadFile("duinoCode//duinoCode.ino")
+	if *resetChat {
+		duinoExamplePrompt, err = os.ReadFile("xmasTwinkleDuino.c")
+		log.Printf(" resetChat")
+		// Rename and Remove log file:
+		Original_Path := "chatHist.txt"
+		New_Path := "old_chatHist.txt"
+		e := os.Rename(Original_Path, New_Path)
+		if e != nil {
+			fmt.Printf("e : %v\n", e)
+		}
+	} else {
+		duinoExamplePrompt, err = os.ReadFile("duinoCode//duinoCode.ino")
+		log.Printf("using duinoCode.ino")
+	}
 
-	// Rename and Remove a file
-	// Using Rename() function
-	// Original_Path := "mic.wav"
-	// New_Path := "old_mic.wav.txt"
-	// e := os.Rename(Original_Path, New_Path)
-	// if e != nil {
-	// 	fmt.Printf("e : %v\n", e)
-	// }
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(3)
+	}
+
+	// Rename last mic recording
+
+	Original_Path := "mic.wav"
+	New_Path := "old_mic.wav.txt"
+	e := os.Rename(Original_Path, New_Path)
+	if e != nil {
+		fmt.Printf("e : %v\n", e)
+	}
+
+	// os.Exit(3)
 
 	fmt.Println("winmm.dll Record Audio to .wav file")
 
@@ -99,8 +127,6 @@ func main() {
 	}
 
 	// time.Sleep(200 * time.Millisecond)
-
-	// fmt.Println("Listening...")
 
 	// time.Sleep(5 * time.Second)
 
@@ -140,6 +166,8 @@ func main() {
 
 	// // fmt.Printf("Input : %v\n", iru)
 	// close(input)
+
+	// now save new recording:
 
 	i = MCIWorker("save capture mic.wav", "", 0, 0)
 	if i != 0 {
@@ -209,7 +237,33 @@ func main() {
 	fmt.Println(resp.Text)
 
 	newPrompt := resp.Text
+
+	f, err := os.Create("newPrompt.txt")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	_, err = f.WriteString(str)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
+	// fmt.Println(l, "newPrompt.txt successfully")
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	//--------------------
+
+	var promptIntro string
+	if *resetChat {
+		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create a christmas effect on an LED strip:"
+	} else {
+		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create an LED strip"
+	}
 
 	req2 := openai.ChatCompletionRequest{
 		Model: openai.GPT3Dot5Turbo,
@@ -217,13 +271,10 @@ func main() {
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: "Here is an example C code for an Arduino using the FastLED library to create a christmas effect on an LED strip:",
-				// Content: "My name is Bob.",
+				Content: promptIntro,
 			},
 		},
 	}
-
-	// duinoExamplePromptStr = "what is my name?"
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
@@ -267,7 +318,25 @@ func main() {
 	responseContent := resp2.Choices[0].Message.Content
 	str = string(responseContent) // convert content to a 'string'
 
-	fmt.Println(str)
+	// fmt.Println(str)
+
+	f, err = os.Create("chatResponseRaw.txt")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	_, err = f.WriteString(str)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
+	// fmt.Println(l, "chatResponseRaw.txt successfully")
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	char := "#include" // assume this is first line of C!
 
@@ -275,9 +344,7 @@ func main() {
 	fmt.Println(index)
 	if index == -1 {
 		fmt.Printf("Character '%s' not found in the string.\n", char)
-
 		index = 1
-
 		return
 	}
 	trimmedStr := str[index:]
@@ -298,18 +365,18 @@ func main() {
 
 	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
 
-	f, err := os.Create("duinoCode//duinoCode.ino")
+	f, err = os.Create("duinoCode//duinoCode.ino")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	l, err := f.WriteString(trimmedStr)
+	_, err = f.WriteString(trimmedStr)
 	if err != nil {
 		fmt.Println(err)
 		f.Close()
 		return
 	}
-	fmt.Println(l, "bytes written successfully")
+	// fmt.Println(l, "duinoCode.ino written successfully")
 	err = f.Close()
 	if err != nil {
 		fmt.Println(err)
