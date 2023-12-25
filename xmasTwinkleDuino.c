@@ -1,19 +1,19 @@
 #include <FastLED.h>
 
-#define LED_PIN     6
-#define COLOR_ORDER GRB
-#define CHIPSET     WS2812B
-#define NUM_LEDS    30
+#define LED_PIN     6  // do not change
+#define COLOR_ORDER GRB  // do not change
+#define CHIPSET     WS2812B   // do not change
+#define NUM_LEDS    30  // do not change
 
-#define BRIGHTNESS  200
-#define FRAMES_PER_SECOND 20
+#define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
+#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
   delay(3000); // sanity delay
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
 }
 
 void loop() {
@@ -32,9 +32,11 @@ void ChristmasLights() {
   }
 
   // Optional: Add a twinkling effect
+  int brightness = 64;
   for (int j = 0; j < NUM_LEDS; j++) {
     if (random8() < 50) { // adjust the probability to control twinkling
       leds[j] = CRGB::Black; // 'turn off' the LED randomly
+//      leds[j].maximizeBrightness(brightness); // do not use maximizeBrightness!
     }
   }
 }

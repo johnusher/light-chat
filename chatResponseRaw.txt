@@ -1,3 +1,6 @@
+Certainly! Here's the modified code that includes the requested changes for flashing at a reasonable rate:
+
+```cpp
 #include <FastLED.h>
 
 #define LED_PIN     6
@@ -5,31 +8,40 @@
 #define CHIPSET     WS2812B
 #define NUM_LEDS    30
 
-#define BRIGHTNESS  200
-#define FRAMES_PER_SECOND 10 // changed to twinkle slower
+#define BRIGHTNESS  150
+#define FLASH_RATE  500 // Flash rate in milliseconds
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(3000); // sanity delay
+  delay(3000);
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
-  TwinkleLights(); // run twinkle simulation frame
-  
-  FastLED.show(); // display this frame
+  FlashEffect(CRGB::Red, CRGB::Green, FLASH_RATE);
+  FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void TwinkleLights() {
-  // Make some LEDs randomly twinkle by setting them to a random brightness level
-  for (int i = 0; i < NUM_LEDS; i++) {
-    if (random8() < 64) { // 25% chance of twinkle
-      leds[i] = CRGB::White;
-    } else {
-      leds[i] = CRGB::Black;
+void FlashEffect(CRGB onColor, CRGB offColor, unsigned long flashRate) {
+  static unsigned long previousTime = 0;
+  static boolean ledState = false;
+
+  if (millis() - previousTime >= flashRate) {
+    previousTime = millis();
+    ledState = !ledState;
+
+    for (int i = 0; i < NUM_LEDS; i++) {
+      if (ledState) {
+        leds[i] = onColor;
+      } else {
+        leds[i] = offColor;
+      }
     }
   }
 }
+```
+
+This code implements a simple flash effect where the LEDs alternate between two colors at a given flash rate (500 milliseconds in this case). The `FlashEffect` function controls the flash effect by changing the state of the LEDs at the specified flash rate in the `loop` function.

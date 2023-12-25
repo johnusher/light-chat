@@ -21,7 +21,6 @@ import (
 	"unsafe"
 
 	openai "github.com/sashabaranov/go-openai"
-	"github.com/schollz/progressbar/v3"
 )
 
 var (
@@ -86,7 +85,7 @@ func main() {
 	// Rename last mic recording
 
 	Original_Path := "mic.wav"
-	New_Path := "old_mic.wav.txt"
+	New_Path := "old_mic.wav"
 	e := os.Rename(Original_Path, New_Path)
 	if e != nil {
 		fmt.Printf("e : %v\n", e)
@@ -100,6 +99,10 @@ func main() {
 	if i != 0 {
 		log.Fatal("Error Code A: ", i)
 	}
+
+	// var bitspersample = 16
+	// var channels = 1
+	// var alignment = bitspersample * channels / 8
 
 	i = MCIWorker("set capture bitspersample 16", "", 0, 0)
 	if i != 0 {
@@ -127,50 +130,66 @@ func main() {
 	}
 
 	// time.Sleep(200 * time.Millisecond)
-
 	// time.Sleep(5 * time.Second)
 
-	bar := progressbar.Default(25)
-	for i := 0; i < 25; i++ {
-		bar.Add(1)
-		time.Sleep(200 * time.Millisecond)
-	}
+	// following is unreliable for saving
 
-	// I want to replace the above sleep command with below wait for keyboard but it is unreliable!
-
-	// input := make(chan rune, 1)
+	input := make(chan rune, 1)
 	// var iru rune
-	// fmt.Println("recording + waiting keyboard input...")
-	// go readKey(input)
-	// select {
-	// case iru = <-input:
-	// 	// fmt.Printf("Input : %v\n", i)
+	fmt.Println("recording + waiting keyboard return input...")
 
-	// 	// close(input)
-
-	// case <-time.After(5000 * time.Millisecond):
-	// 	fmt.Println("Time out!")
-	// 	// i = MCIWorker("save capture mic.wav", "", 0, 0)
-	// 	// if i != 0 {
-	// 	// 	log.Fatal("Error Code C: ", i)
-	// 	// }
-
-	// 	// i = MCIWorker("close capture", "", 0, 0)
-	// 	// if i != 0 {
-	// 	// 	log.Fatal("Error Code D: ", i)
-	// 	// }
-
-	// 	// fmt.Println("Audio saved to mic.wav")
-
+	// bar := progressbar.Default(13)
+	// for i := 0; i < 13; i++ {
+	// 	bar.Add(1)
+	// 	time.Sleep(300 * time.Millisecond)
 	// }
 
-	// // fmt.Printf("Input : %v\n", iru)
+	go readKey(input)
+	select {
+	case <-input:
+		// fmt.Printf("Input : %v\n", i)
+		// close(input)
+
+	case <-time.After(9000 * time.Millisecond):
+		fmt.Println("Time out!")
+		// i = MCIWorker("save capture mic.wav", "", 0, 0)
+		// if i != 0 {
+		// 	log.Fatal("Error Code C: ", i)
+		// }
+
+		// i = MCIWorker("close capture", "", 0, 0)
+		// if i != 0 {
+		// 	log.Fatal("Error Code D: ", i)
+		// }
+
+		// fmt.Println("Audio saved to mic.wav")
+
+	}
+
+	// fmt.Printf("Input : %v\n", iru)
 	// close(input)
 
 	// now save new recording:
 
-	i = MCIWorker("save capture mic.wav", "", 0, 0)
-	if i != 0 {
+	// i = MCIWorker("save capture mic.wav", "", 0, 0)
+	// if i != 0 {
+	// 	log.Fatal("Error Code C: ", i)
+	// }
+
+	n := 1
+	for n < 150 {
+		i = MCIWorker("save capture mic.wav", "", 0, 0)
+		if i != 0 {
+			// log.Fatal("Error Code C: ", i)
+			n = n + 1
+			time.Sleep(50 * time.Millisecond)
+		} else {
+			// n = 51
+			break
+		}
+	}
+	fmt.Printf("n= %v \n", n)
+	if n == 150 {
 		log.Fatal("Error Code C: ", i)
 	}
 
@@ -243,7 +262,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	_, err = f.WriteString(str)
+	_, err = f.WriteString(newPrompt)
 	if err != nil {
 		fmt.Println(err)
 		f.Close()
@@ -262,7 +281,7 @@ func main() {
 	if *resetChat {
 		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create a christmas effect on an LED strip:"
 	} else {
-		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create an LED strip"
+		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create light patterns for an LED strip:"
 	}
 
 	req2 := openai.ChatCompletionRequest{
@@ -282,7 +301,7 @@ func main() {
 	})
 
 	// duinoExamplePromptStr = "please update the code to make it look like disco lights flashing at 120 beats-per-minute."
-	duinoExamplePromptStr = "please generate new code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB"
+	duinoExamplePromptStr = "please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB"
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
@@ -307,7 +326,6 @@ func main() {
 	resp2, err := client.CreateChatCompletion(context.Background(), req2)
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
-		// continue
 	}
 
 	log.Printf(" request ok...")
