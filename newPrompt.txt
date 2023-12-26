@@ -1,1 +1,57 @@
-Flash at what is a reasonable rate.
+Here is an example C code for an Arduino using the FastLED library to create light patterns for an LED strip:#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 30
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  blueRedMovingLight(); // Modified to handle both blue and red light
+
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void blueRedMovingLight() {
+  static int pos = 0;
+  static bool direction = true;
+  static bool isBlue = true;
+  
+  // Turn off previous LED
+  leds[pos] = CRGB::Black;
+  
+  // Move the position
+  if (direction) {
+    pos++;
+    if (pos == NUM_LEDS) {
+      pos = NUM_LEDS - 1;
+      direction = false;
+      isBlue = !isBlue;
+    }
+  } else {
+    pos--;
+    if (pos == -1) {
+      pos = 0;
+      direction = true;
+      isBlue = !isBlue;
+    }
+  }
+  
+  // Set the current LED to blue or red based on isBlue flag
+  if (isBlue) {
+    leds[pos] = CRGB::Blue;
+  } else {
+    leds[pos] = CRGB::Red;
+  }
+}please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. Please provide a response in C code. Here is the request: Make it change colour from blue to red more randomly.

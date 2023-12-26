@@ -53,11 +53,33 @@ func main() {
 	log.Printf(" starting lightChat3000")
 
 	resetChat := flag.Bool("r", false, "reset chat history to xmas example")
-
 	flag.Parse()
 
-	var duinoExamplePrompt []byte
+	comPort := "COM5"
 
+	if runtime.GOOS == "windows" {
+		boards, err := exec.Command("arduino-cli.exe", "board", "list").Output()
+		if err != nil {
+			log.Printf(" COM problem \n")
+			log.Fatal(err)
+		}
+
+		boardsS := string(boards)
+		// log.Printf("boards %v \n", boardsS)
+		charS := "COM"
+		index := strings.Index(boardsS, charS)
+
+		if index == -1 {
+			fmt.Printf("Character '%s' not found in the string.\n", charS)
+			os.Exit(3)
+		}
+		comPort = boardsS[index : index+4]
+		log.Printf("comPort = %v \n", comPort)
+	}
+
+	// os.Exit(3)
+
+	var duinoExamplePrompt []byte
 	var err error
 
 	// load example duno code for prompt:
@@ -177,7 +199,7 @@ func main() {
 	// }
 
 	n := 1
-	for n < 150 {
+	for n < 850 {
 		i = MCIWorker("save capture mic.wav", "", 0, 0)
 		if i != 0 {
 			// log.Fatal("Error Code C: ", i)
@@ -189,7 +211,7 @@ func main() {
 		}
 	}
 	fmt.Printf("n= %v \n", n)
-	if n == 150 {
+	if n == 850 {
 		log.Fatal("Error Code C: ", i)
 	}
 
@@ -256,24 +278,7 @@ func main() {
 	fmt.Println(resp.Text)
 
 	newPrompt := resp.Text
-
-	f, err := os.Create("newPrompt.txt")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	_, err = f.WriteString(newPrompt)
-	if err != nil {
-		fmt.Println(err)
-		f.Close()
-		return
-	}
-	// fmt.Println(l, "newPrompt.txt successfully")
-	err = f.Close()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	newPromptStr := ""
 
 	//--------------------
 
@@ -294,30 +299,55 @@ func main() {
 			},
 		},
 	}
+	newPromptStr = promptIntro
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
-		Content: duinoExamplePromptStr,
+		Content: duinoExamplePromptStr, // add example code
 	})
+
+	newPromptStr = newPromptStr + duinoExamplePromptStr
 
 	// duinoExamplePromptStr = "please update the code to make it look like disco lights flashing at 120 beats-per-minute."
-	duinoExamplePromptStr = "please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB"
+	duinoExamplePromptStr = "please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. "
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
 		Content: duinoExamplePromptStr,
 	})
+
+	newPromptStr = newPromptStr + duinoExamplePromptStr
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
 		Content: newPrompt,
 	})
 
-	duinoExamplePromptStr = "Please provide a response in C code"
+	duinoExamplePromptStr = "Please provide a response in C code. Here is the request: "
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
 		Content: duinoExamplePromptStr,
 	})
+
+	newPromptStr = newPromptStr + duinoExamplePromptStr + newPrompt
+
+	f, err := os.Create("newPrompt.txt")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	_, err = f.WriteString(newPromptStr)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return
+	}
+
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// log.Printf("prompt : %+v\n", req2.Messages) // how do i print this??
 	// var req2 openai.ChatCompletionRequest
@@ -371,14 +401,13 @@ func main() {
 	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
 
 	char = "```"
-
 	index2 := strings.Index(trimmedStr, char)
 
 	// fmt.Println(index2)
 
 	if index2 > 0 {
 		trimmedStr = trimmedStr[:index2]
-		fmt.Printf("index2: %v\n", index2)
+		// fmt.Printf("index2: %v\n", index2)
 	}
 
 	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
@@ -418,7 +447,7 @@ func main() {
 		}
 		fmt.Println("Result: " + out.String())
 
-		c = exec.Command("arduino-cli.exe", "upload", "-p", "COM5", "-b", "arduino:avr:diecimila:cpu=atmega328", "duinoCode\\duinoCode.ino", "-v")
+		c = exec.Command("arduino-cli.exe", "upload", "-p", comPort, "-b", "arduino:avr:diecimila:cpu=atmega328", "duinoCode\\duinoCode.ino", "-v")
 
 		// var out bytes.Buffer
 		// var stderr bytes.Buffer

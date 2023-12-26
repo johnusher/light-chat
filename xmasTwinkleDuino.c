@@ -11,7 +11,7 @@
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(3000); // sanity delay
+  delay(1000); // sanity delay
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
 }

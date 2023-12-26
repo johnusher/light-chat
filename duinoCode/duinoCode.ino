@@ -6,36 +6,55 @@
 #define NUM_LEDS    30
 
 #define BRIGHTNESS  150
-#define FLASH_RATE  500 // Flash rate in milliseconds
+#define FRAMES_PER_SECOND 30
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(3000);
+  delay(1000);
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
-  FlashEffect(CRGB::Red, CRGB::Green, FLASH_RATE);
+  randomColorMovingLight(); // Modified to change color randomly
+
   FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void FlashEffect(CRGB onColor, CRGB offColor, unsigned long flashRate) {
-  static unsigned long previousTime = 0;
-  static boolean ledState = false;
-
-  if (millis() - previousTime >= flashRate) {
-    previousTime = millis();
-    ledState = !ledState;
-
-    for (int i = 0; i < NUM_LEDS; i++) {
-      if (ledState) {
-        leds[i] = onColor;
-      } else {
-        leds[i] = offColor;
-      }
+void randomColorMovingLight() {
+  static int pos = 0;
+  static bool direction = true;
+  static CRGB currentColor = CRGB::Blue;
+  
+  // Turn off previous LED
+  leds[pos] = CRGB::Black;
+  
+  // Move the position
+  if (direction) {
+    pos++;
+    if (pos == NUM_LEDS) {
+      pos = NUM_LEDS - 1;
+      direction = false;
+      currentColor = randomColor();
+    }
+  } else {
+    pos--;
+    if (pos == -1) {
+      pos = 0;
+      direction = true;
+      currentColor = randomColor();
     }
   }
+  
+  // Set the current LED to the random color
+  leds[pos] = currentColor;
+}
+
+CRGB randomColor() {
+  int r = random(256);
+  int g = random(256);
+  int b = random(256);
+  return CRGB(r, g, b);
 }
