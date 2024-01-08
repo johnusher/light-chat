@@ -1,0 +1,63 @@
+0:0 
+Greetings Earthlings.
+I want to share this fun project I made over the festive period: how to control a strip of programable LEDs with your voice using the ChatGPT API.
+The basic idea is this:
+
+---- show xmasTwinkleDuino.c
+We begin with a short example script to generate some light patterns for an Arduino.
+This is the C code for this example.
+You can see it uses the fast-LED library.
+Sets the output pin on the Arduino.
+etc
+This pattern is loaded onto the Arduno by default as we can see on the LED strip on my head.
+And we modify the pattern using a spoken voice prompt. 
+the voice prompt adjusts the LED light pattern, such as "make the lights less Christmassy".
+This voice prompt is converted to text using OpenAI's Whisper Model. 
+-- This means we send the recorded audio file to Open AI's Audio API.
+-nd a second or so later we get the text back.
+
+We then generate a ChatGPT text prompt. 
+By combining the original example Arduino code with the new text prompt.
+We add some text in between so that the prompt reads something like:
+Here is some code for generating xxx
+And we append the voice prompt.
+
+And we send this to the ChatGPT API.
+The response hopefully contains some new Arduino C code to generate a new light pattern for the programable LED strip.
+We parse this respose for valid C code, 
+and program the Arduino with this new code. 
+We use the Arduino command-line-interface to do this.
+
+Besides the Arduino C code, I wrote this project in Golang. 
+this is my favourite language for projects using very different software and hardware systems.
+I use it in my Rasperberry pi magic wand project that has many different hardware modules, 
+such as GPS, accelerometer, and an arduino to control a programmable LED.
+It allows for concurrency between these modules.
+It is also extremely fast, which I like for my audio and AI projects.
+It is extremely robust.
+And it looks nice.
+So, go-golang!
+
+It works on a windows OS using the ancient winmm.dll  to record audio, which saved me installing the coreaudio library.
+
+
+
+
+Et voila!
+
+
+
+Some things I learnt:
+ChatGPT4 is generally better than ChatGPT 3.5 Turbo-- for instance, 3.5 got the colours of xxx flag wrong.
+But: ChatGPT4 did once produce some invalid code (once in about 50).- it created a function that was not in the fastLED library.
+The cost of using the OpenAI API can add up: cost about 1 cent a pop, including both Whisper and ChatGPT 4.
+The time from voice prompt to lights is about xx minutes.
+
+
+Thanks to my excellent friends:
+Nimrod Gileadi- for the idea of including some source code in the prompt.
+Andrew Seigner - for help with the Golang.
+
+
+
+

@@ -1,3 +1,6 @@
+Sure, here is the modified code with psychedelic colors (mostly various shades of Green, Red and Blue)
+
+```C
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -39,3 +42,7 @@ void PartyLights() {
     }
   }
 }
+```
+Explanation:
+
+The original Christmas lights function has been modified into a "PartyLights" function to make the LED strip display bright, vibrant colors in a repeating pattern of Red, Green and Purple to create a party atmosphere suitable for 420 wink-wink. The random 'twinkling' effect has been kept to enhance the party mood. Adjust the brightness or intensity as per requirements. The rest of the LED setup code remains unchanged.

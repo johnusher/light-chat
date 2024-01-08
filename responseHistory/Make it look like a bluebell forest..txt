@@ -1,3 +1,6 @@
+Here is the C code which will give a twinkling blue effect, to create an effect similar to bluebell flowers scattered around a forest. 
+
+```
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -17,25 +20,25 @@ void setup() {
 }
 
 void loop() {
-  PartyLights(); // run simulation frame
+  BluebellForest(); // run simulation frame
   
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void PartyLights() {
-  // Fill the LEDs with a repeating pattern of different shades of blue and green
-  for (int i = 0; i < NUM_LEDS; i += 3) {
-    leds[i] = CRGB(255, 0, 0);  //Red
-    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB(0, 255, 0);  //Green
-    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB(180, 0, 255);  //Purple
+void BluebellForest() {
+  // Fill the LEDs with a blue shade
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Blue;   
   }
 
   // Optional: Add a twinkling effect
-  int brightness = 64;
   for (int j = 0; j < NUM_LEDS; j++) {
     if (random8() < 50) { // adjust the probability to control twinkling
       leds[j] = CRGB::Black; // 'turn off' the LED randomly
     }
   }
 }
+```
+
+In the above code, I replaced the pattern of red, green and white with a constant blue color, to represent the bluebell flowers. By randomly turning off some LEDs, it simulates the scattered nature of the bluebell flowers in the forest.

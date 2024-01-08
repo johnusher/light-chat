@@ -1,0 +1,42 @@
+Provide the modified C code to reduce the flashing rate of the LED lights. Use a lower value other than `50` to reduce the probability of an LED turning off, hence reducing the flashing.
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6 
+#define COLOR_ORDER GRB 
+#define CHIPSET     WS2812B   
+#define NUM_LEDS    30  
+
+#define BRIGHTNESS  150    
+#define FRAMES_PER_SECOND 5   
+
+CRGB leds[NUM_LEDS];
+ 
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  BluebellForest();
+  
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void BluebellForest() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Blue; 
+  }
+
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 20) { 
+      leds[j] = CRGB::Black; 
+    }
+  }
+}
+```
+
+In this modified C code, the flashing rate has been reduced by lowering the probability of an LED turning off inside the BluebellForest function. This was achieved by replacing the `50` in the if condition with `20`. Consequently, the twinkling effect is less frequent because the probability of an LED 'turning off' is lower.

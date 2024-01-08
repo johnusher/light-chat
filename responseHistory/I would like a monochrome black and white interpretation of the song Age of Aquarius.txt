@@ -1,0 +1,45 @@
+Creating a monochrome interpretation of the song Age of Aquarius on an LED strip using the Arduino platform and the FastLED library directly translates the audio into light effects can be a bit abstract because of the Arduino's hardware limitations.
+
+However, it can be interpreted in the following way: The song's theme is about peace, harmony, and a new age that is dawning. This can be represented by a slow but steady transition from black (off LEDs) to white (fully bright/full on LEDs), representing the transition from the old age to the new Age of Aquarius.
+
+Remember that this is quite abstract and the LEDs themselves will not be able to play the song or any kind of music.
+
+```C
+#include <FastLED.h>
+
+#define LED_PIN         6
+#define COLOR_ORDER     GRB
+#define CHIPSET         WS2812B
+#define NUM_LEDS        30
+#define BRIGHTNESS      150
+#define FRAMES_PER_SECOND 100 
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  AquariusEffect();
+
+  FastLED.show(HALF);
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void AquariusEffect() {
+  static uint8_t brightness = 0;
+
+  fill_solid(leds, NUM_LEDS, CRGB::White);
+  fadeToBlackBy(leds, NUM_LEDS, brightness);
+  brightness++;  
+
+  if (brightness == 255) {
+    brightness = 0;  
+  } 
+}
+```
+
+In the `AquariusEffect` function, we're using a static variable `brightness` that slowly increments every frame (it goes from 0 to 255 then back to 0 and so on). This is used to gradually and continuously fade the strip from black to white and back to black, creating a loop.

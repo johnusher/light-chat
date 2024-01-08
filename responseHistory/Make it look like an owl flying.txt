@@ -1,0 +1,49 @@
+Creating an effect that looks like an owl flying on an LED strip could be a complex task as it requires an abstract representation of an owl and its movement on an LED strip. We can achieve this by creating a pattern in which two different colored lights represent the two eyes of the owl flying from one end of the LED strip to the other. Here is a potential C code implementation:
+
+```C
+#include <FastLED.h>
+
+#define LED_PIN     6  // do not change
+#define COLOR_ORDER GRB  // do not change
+#define CHIPSET     WS2812B   // do not change
+#define NUM_LEDS    30  // do not change
+#define EYE_DISTANCE  3  // distance between the 'eyes'
+#define MOVE_DELAY   300  // delay for owl's movement
+
+#define BRIGHTNESS  150    // set brightness of all LEDs
+#define FRAMES_PER_SECOND 5   // 5 is slow. 
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); // sanity delay
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
+}
+
+void loop() {
+  // run simulation frame
+  OwlFlying(); 
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void OwlFlying() {
+ for (int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGB::Black; //Initialize all leds to Off
+  }
+
+ for (int i = 0; i < NUM_LEDS-EYE_DISTANCE; i++){
+    leds[i] = CRGB::Yellow; //The Owl's left eye
+    leds[i+EYE_DISTANCE] = CRGB::Yellow; //The Owl's right eye
+    FastLED.show();
+    delay(MOVE_DELAY);
+    leds[i] = CRGB::Black; //Turn off the owl's eyes
+    leds[i+EYE_DISTANCE] = CRGB::Black;
+  }
+}
+```
+
+The above code starts by turning all the LEDs off. Then it creates a pair of yellow 'eyes' on the LED strip. The 'eyes' are represented by two yellow lights, placed EYE_DISTANCE LEDs apart. The eyes then 'fly' down the strip, giving the illusion of an owl flying. The eyes are turned off on each iteration to give the appearance of movement. The speed of the 'owl' can be controlled by adjusting the MOVE_DELAY. If the LED strip is large and you want the owl to be more recognizable you could consider making EYE_DISTANCE larger. 
+
+Remember: Loading and running code on your microcontroller could have unintended side effects. Always review code from the internet with extra caution.

@@ -1,0 +1,40 @@
+Here's the modified Arduino code to alternate colors between blue and green:
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6 
+#define COLOR_ORDER GRB 
+#define CHIPSET     WS2812B   
+#define NUM_LEDS    30  
+
+#define BRIGHTNESS  150    
+#define FRAMES_PER_SECOND 5   
+
+CRGB leds[NUM_LEDS];
+ 
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  BlueGreenAlternating();
+  
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void BlueGreenAlternating() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if (i % 2 == 0) {            
+      leds[i] = CRGB::Blue;
+    } else {
+      leds[i] = CRGB::Green; 
+    }
+  }
+}
+```
+
+The main difference is in the `BlueGreenAlternating()` function. Here, the code iterates over each LED with a for loop. If the index `i` is an even number (which we check with `i % 2 == 0`), the LED is set to blue. If the index is an odd number, the LED is set to green. This results in an alternating pattern of blue and green LEDs across the entire strip.
