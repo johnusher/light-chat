@@ -1,6 +1,6 @@
-Sure, here is the modified code with psychedelic colors (mostly various shades of Green, Red and Blue)
+Here is your new code:
 
-```C
+```
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -27,11 +27,10 @@ void loop() {
 }
 
 void PartyLights() {
-  // Fill the LEDs with a repeating pattern of different shades of blue and green
-  for (int i = 0; i < NUM_LEDS; i += 3) {
-    leds[i] = CRGB(255, 0, 0);  //Red
-    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB(0, 255, 0);  //Green
-    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB(180, 0, 255);  //Purple
+  // Fill the LEDs with a repeating pattern of green and purple
+  for (int i = 0; i < NUM_LEDS; i += 2) {
+    leds[i] = CRGB::Green; 
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Purple;
   }
 
   // Optional: Add a twinkling effect
@@ -39,10 +38,10 @@ void PartyLights() {
   for (int j = 0; j < NUM_LEDS; j++) {
     if (random8() < 50) { // adjust the probability to control twinkling
       leds[j] = CRGB::Black; // 'turn off' the LED randomly
+//      leds[j].maximizeBrightness(brightness); // do not use maximizeBrightness!
     }
   }
 }
 ```
-Explanation:
 
-The original Christmas lights function has been modified into a "PartyLights" function to make the LED strip display bright, vibrant colors in a repeating pattern of Red, Green and Purple to create a party atmosphere suitable for 420 wink-wink. The random 'twinkling' effect has been kept to enhance the party mood. Adjust the brightness or intensity as per requirements. The rest of the LED setup code remains unchanged.
+Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.

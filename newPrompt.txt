@@ -1,0 +1,53 @@
+Here is an example C code for an Arduino using the FastLED library to create light patterns for an LED strip.  This is the existing pattern: 
+ ``` 
+#include <FastLED.h>
+
+#define LED_PIN     6  // do not change
+#define COLOR_ORDER GRB  // do not change
+#define CHIPSET     WS2812B   // do not change
+#define NUM_LEDS    30  // do not change
+
+#define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
+#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); // sanity delay
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
+}
+
+void loop() {
+  PartyLights(); // run simulation frame
+  
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void PartyLights() {
+  // Fill the LEDs with a repeating pattern of green and purple
+  for (int i = 0; i < NUM_LEDS; i += 2) {
+    leds[i] = CRGB::Green; 
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Purple;
+  }
+
+  // Optional: Add a twinkling effect
+  int brightness = 64;
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 50) { // adjust the probability to control twinkling
+      leds[j] = CRGB::Black; // 'turn off' the LED randomly
+//      leds[j].maximizeBrightness(brightness); // do not use maximizeBrightness!
+    }
+  }
+}
+
+ ``` 
+ Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. Please provide a response in C code. After the code please briefly explain the decision for your response. Here is the request: 
+ Now make the lights more romantic.
+	Remember: 1. Always format the code in code blocks.
+	2. Do not leave unimplemented code blocks in your response.
+	3. The only allowed library is fastLED. Do not import or use any other library.
+	4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
+	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
+	6. Begin and end the new C code with the code block symbol of 3 backticks.

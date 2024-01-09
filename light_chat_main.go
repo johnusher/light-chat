@@ -1,21 +1,25 @@
 package main
 
 // light_chat_main.go
-// voice light control
 
-// use:
+// Chat-GPT enabled control of a strip of programmable LEDs using a text or voice prompt.
+// For speech to text we use the OpenAI Whisper API.
+// To program the LEDs we use an Arduino.
+// The user prompt will generate new Arduino code to modify the existing light pattern or to generate a new pattern.
+
+// Useage:
 // go run .\light_chat_main.go
 // flags:
 // -p "make lights kinda blue"= text input (default is use microphone)
-// -r (bool) reset reference light pattern to xmasTwinkleDuino.const
-//  -nb (bool) = use no board
+// -r (bool) reset reference light pattern to xmasTwinkleDuino.c
+// -nb (bool) = no-board: (no Arduino connected). A response is still generated in
 
 // Using a voice or text prompt, we program a strip of Arduino-controlled LEDs.
 
 // 1. Obtain desired new or ammended light pattern - use text or ...
 //    ... listen to microphone and convert speech to text using online chatgpt whisper api
 // 3. create new prompt to replace or update light pattern according.
-// 4. send new prompt to chatgpt
+// 4. Send new prompt to chatgpt
 // 5. Receive ChatGPT response, parse for valid Arduino C code.
 // 6. Compile new light pattern and program Arduino (using Ardunio-CLI).
 
@@ -140,17 +144,11 @@ func main() {
 
 	if *resetChat {
 		log.Printf("reset flag used: using xmasTwinkleDuino.c")
-
 		// reset flag used- use the default c code as a reference for the prompt
 		duinoExamplePrompt, err = os.ReadFile("xmasTwinkleDuino.c")
-		// Rename and Remove log file:
-		// Original_Path := "chatHist.txt"
-		// New_Path := "old_chatHist.txt"
-		// e := os.Rename(Original_Path, New_Path)
-		// if e != nil {
-		// 	fmt.Printf("e : %v\n", e)
-		// }
+
 	} else {
+		// modify the existing light program:
 		duinoExamplePrompt, err = os.ReadFile("duinoCode//duinoCode.ino")
 		log.Printf("  reset not used. using duinoCode.ino as reference code.")
 	}
@@ -165,22 +163,18 @@ func main() {
 
 	// now setup ChatGPT-API connection:
 
-	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load my secret chatgpt apiKey
+	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load your secret chatgpt apiKey
 	if err != nil {
 		fmt.Print(err)
 		os.Exit(3)
 	}
-	str := string(secretAPI) // convert content to a 'string'
+	str := string(secretAPI)
 	apiKey := str
 
 	if err != nil {
 		fmt.Print(err)
 		os.Exit(3)
 	}
-
-	// prompt := {map[string]interface{}{"role": "user", "content": "Here is an example C code for an Arduino using the FastLED library to create a christmas effect on an LED strip: ."},
-	// 	map[string]interface{}{"role": "user", "content": duinoExamplePromptStr},
-	// 	map[string]interface{}{"role": "user", "content": "please update the code to make it look like disco lights flashing at 120 beats-per-minute. Please providing a response in C code."}}
 
 	client := openai.NewClient(apiKey)
 	ctx := context.Background()
@@ -189,14 +183,6 @@ func main() {
 
 		// we are using speech input with the microphone
 		// only works on windows OS!
-		// Rename last mic recording
-
-		// Original_Path := "mic.wav"
-		// New_Path := "old_mic.wav"
-		// e := os.Rename(Original_Path, New_Path)
-		// if e != nil {
-		// 	fmt.Printf("e : %v\n", e)
-		// }
 
 		fmt.Println("Use winmm.dll to record Audio to .wav file")
 
@@ -230,20 +216,19 @@ func main() {
 			log.Fatal("Error Code B: ", i)
 		}
 
-		// following wait loop method is unreliable for saving wav file:
+		// following wait method is unreliable for saving wav file:
 
 		input := make(chan rune, 1)
 		fmt.Println("recording mic \n")
 		fmt.Println("hit keyboard return to finish \n")
 
-		// wat for enter key to finish microphone recording
+		// wait for enter key to finish microphone recording
 		go readKey(input)
 		select {
 		case <-input:
 
 		case <-time.After(18000 * time.Millisecond):
 			fmt.Println("Time out!")
-
 		}
 
 		fmt.Println("hit key")
@@ -293,13 +278,14 @@ func main() {
 	} else {
 		// use text input not speech:
 		newPrompt = *textPromptFlag
+
 		if newPrompt[len(newPrompt)-1] != '.' {
 			newPrompt = newPrompt + "." // append fullstop
 		}
 		// fmt.Println(newPrompt)
 	}
 
-	newPromptStr := ""
+	newPromptStr := "" // create user string prompt
 
 	//--------------------
 
@@ -311,8 +297,8 @@ func main() {
 	}
 
 	req2 := openai.ChatCompletionRequest{
-		// Model: openai.GPT3Dot5Turbo,
-		Model: openai.GPT4,
+		// Model: openai.GPT3Dot5Turbo,   // select GPT3.5: not so great
+		Model: openai.GPT4, // GPT4 is default
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleUser,
@@ -329,7 +315,7 @@ func main() {
 
 	newPromptStr = newPromptStr + duinoExamplePromptStr
 
-	// duinoExamplePromptStr = "please update the code to make it look like disco lights flashing at 120 beats-per-minute."
+	// duinoExamplePromptStr = "please update the code to make it look like disco lights flashing at 120 beats-per-minute."   // sanity check
 	duinoExamplePromptStr = "\n ``` \n Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. "
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
@@ -350,13 +336,14 @@ func main() {
 		Content: duinoExamplePromptStr,
 	})
 
+	// Response rules:
 	duinoExamplePromptStrFinal := `
 	Remember: 1. Always format the code in code blocks.
-	2. Do not leave unimplemented code blocks in your response.
+	2. Do not leave unimplemented code blocks in your response. Begin and end the new C code with the code block symbol of 3 backticks.
 	3. The only allowed library is fastLED. Do not import or use any other library.
 	4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
 	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
-	6. Begin and end the new C code with the code block symbol of 3 backticks.`
+	`
 
 	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
@@ -384,8 +371,6 @@ func main() {
 		return
 	}
 
-	// log.Printf("prompt : %+v\n", req2.Messages) // how do i print this??
-	// var req2 openai.ChatCompletionRequest
 	// look at https://pkg.go.dev/github.com/sashabaranov/go-openai@v1.17.9#section-readme
 
 	resp2, err := client.CreateChatCompletion(context.Background(), req2)
@@ -401,15 +386,15 @@ func main() {
 	responseContent := resp2.Choices[0].Message.Content
 	str = string(responseContent) // convert content to a 'string'
 
-	// fmt.Println(str)
-
-	// f, err = os.Create("chatResponseRaw.txt")
-	responseSn := newPrompt + "txt"
-
+	responseSn := newPrompt
+	responseSn = strings.Replace(responseSn, ".", "-", -1)
+	if len(responseSn) > 75 {
+		responseSn = responseSn[:75]
+	}
+	responseSn = responseSn + ".txt"
 	responseSn = "responseHistory" + "//" + responseSn
 
 	f, err = os.Create(responseSn)
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -420,7 +405,6 @@ func main() {
 		f.Close()
 		return
 	}
-	// fmt.Println(l, "chatResponseRaw.txt successfully")
 	err = f.Close()
 	if err != nil {
 		fmt.Println(err)
@@ -437,9 +421,6 @@ func main() {
 		return
 	}
 	trimmedStr := str[index:]
-
-	// fmt.Println(trimmedStr)
-	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
 
 	char = "```" // C code is wrapped in this code identifier like md format
 	index2 := strings.Index(trimmedStr, char)
@@ -461,14 +442,13 @@ func main() {
 		f.Close()
 		return
 	}
-	// fmt.Println(l, "duinoCode.ino written successfully")
 	err = f.Close()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// now compile and program the arduino board
+	// now compile and program the arduino board.
 	// the compile step is useful to reveal problems with the code.
 	var c *exec.Cmd
 	if runtime.GOOS == "windows" {
@@ -512,11 +492,7 @@ func main() {
 			return
 		}
 		fmt.Println("Result: " + out.String())
-		// if err := c.Run(); err != nil {
-		// 	fmt.Println("Error: ", err)
-		// }
-
-		os.Exit(3)
+		os.Exit(3) // peace out
 
 	}
 

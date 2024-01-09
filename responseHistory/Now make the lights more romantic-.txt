@@ -1,0 +1,35 @@
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+
+#define BRIGHTNESS  80
+#define FRAMES_PER_SECOND 2
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  RomanticLights();
+  
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void RomanticLights() {
+  for (int i = 0; i < NUM_LEDS; ++i) {
+    leds[i] = CHSV(0, 255, 255);  // set all LEDs red
+  }
+}
+
+```
+
+The above code will create a "romantic" atmosphere by decreasing the brightness to a soft glow (80 out of 255). It also slows down the frame rate to a calm 2 frames per second. Most importantly, it sets all the LEDs to red (CHSV(0, 255, 255) is a hue-saturation-value representation of the color red), which is traditionally associated with romance.
