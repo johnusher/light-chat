@@ -39,8 +39,8 @@ Response:<br />
 [Barbie's dream house](<responseHistory/Please it Barbie's dream house-.txt>)
 
 
-```Here is a modified code that displays a Barbie's Dream House themed light pattern by alternating between pink, cyan, and white lights, which imitates the traditional color scheme of Barbie. ++ It briefly flashes all LEDs red twice at the initial setup as requested ++ .```
-Note this is an incorrect interpretation of rule #5:
+```Here is a modified code that displays a Barbie's Dream House themed light pattern by alternating between pink, cyan, and white lights, which imitates the traditional color scheme of Barbie. ++ It briefly flashes all LEDs red twice at the initial setup as requested ++ .```<br /> 
+Note this last part ++ xxx ++ is an incorrect interpretation of rule #5:<br /> 
 ```	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.```
 
 
@@ -84,7 +84,7 @@ This took 1.4 minutes to receive a response and the code compiled first time.
 
 # How it works
 1. Obtain desired new or ammended light pattern using a text or microphone recording and convert speech to text using the OpenAI Whisper api.
-3. Create a new prompt to replace or update the light pattern accordingly. <br /> 
+2. Create a new prompt to replace or update the light pattern accordingly. <br /> 
 We concat the following text:<br /> 
     "Here is an example of C code for an Arduino using the FastLED library to create light patterns for an LED strip.  This is the existing pattern:"<br /> 
     &lt; insert C code from example reference &gt; <br /> 
@@ -92,11 +92,11 @@ We concat the following text:<br />
     &lt; user prompt &gt; <br /> 
     "These are the rules:"<br /> 
     &lt; 1. Always format the code in code blocks. etc...&gt;<br /> 
-4. Send this new prompt to ChatGPT.
-5. Receive ChatGPT response and parse for valid C code.
-6. Compile new light pattern.
-7. If the code does not compile, there is a function ```createNewPromptFromBadCode``` to use ChatGPT to amend such bad code : the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code and we prompt ChatGPT to correct the bad code so it compiles. If we again get "bad" code, we abort.
-8. We program the Arduino using the valid code from step 6/7.
+3. Send this new prompt to ChatGPT.
+4. Receive ChatGPT response and parse for valid C code.
+5. Compile new light pattern.
+6. If the code does not compile, there is a function ```createNewPromptFromBadCode``` to use ChatGPT to amend such bad code : the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code and we prompt ChatGPT to correct the bad code so it compiles. If we again get "bad" code, we abort.
+7. We program the Arduino using the valid code from step 5/6.
 
 # Setup the software environment
 
