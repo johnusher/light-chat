@@ -1,0 +1,47 @@
+Here is some C code for an Arduino using the FastLED library to create light patterns for an LED strip: 
+ ``` 
+#include <FastLED.h>
+
+#define LED_PIN         6
+#define COLOR_ORDER     GRB
+#define CHIPSET         WS2812B
+#define NUM_LEDS        30
+#define BRIGHTNESS      150
+#define FRAMES_PER_SECOND 100 
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  AquariusEffect();
+
+  FastLED.show(HALF);
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void AquariusEffect() {
+  static uint8_t brightness = 0;
+
+  fill_solid(leds, NUM_LEDS, CRGB::White);
+  fadeToBlackBy(leds, NUM_LEDS, brightness);
+  brightness++;  
+
+  if (brightness == 255) {
+    brightness = 0;  
+  } 
+}
+
+ ``` 
+ The code does not compile. The compiler creates the following error message:
+- 'HALF' was not declared in this scope
+ Please use this error message to modify the provided code so the modified code compiles. Please provide a response in C code. After the code please briefly explain the decision for your response.  
+ 
+Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
+2. Do not leave unimplemented code blocks in your response. 
+3. The only allowed library is fastLED. Do not import or use any other library.
+4. If you are not sure what value to use, just use your best judge. Do not use None for anything.

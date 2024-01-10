@@ -1,0 +1,43 @@
+The error is that the `HALF` parameter used in the `FastLED.show()` function is not defined anywhere in the code. The `FastLED.show()` function takes no parameters, so the `HALF` which is there could be a mistake, and I will try to remove it. If there is indeed a specific intention to it, it must be fixed accordingly, without making ambiguous arguments to functions.
+
+Here is the corrected code:
+
+```cpp
+#include <FastLED.h>
+
+#define LED_PIN         6
+#define COLOR_ORDER     GRB
+#define CHIPSET         WS2812B
+#define NUM_LEDS        30
+#define BRIGHTNESS      150
+#define FRAMES_PER_SECOND 100 
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  AquariusEffect();
+
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void AquariusEffect() {
+  static uint8_t brightness = 0;
+
+  fill_solid(leds, NUM_LEDS, CRGB::White);
+  fadeToBlackBy(leds, NUM_LEDS, brightness);
+  brightness++;  
+
+  if (brightness == 255) {
+    brightness = 0;  
+  } 
+}
+```
+
+This version of the C code should compile without any errors since 'HALF' is no longer being used as an undeclared argument to FastLED.show(). If for any reason HALF was essential to the original developers intent, they will need to explicitly define it before it can be used.

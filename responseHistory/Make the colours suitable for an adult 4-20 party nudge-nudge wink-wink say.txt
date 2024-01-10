@@ -1,47 +1,44 @@
-Here is your new code:
+Here is a C code that will make the LED strip color suitable for an adult 4-20 party.
 
-```
+```C
 #include <FastLED.h>
 
-#define LED_PIN     6  // do not change
-#define COLOR_ORDER GRB  // do not change
-#define CHIPSET     WS2812B   // do not change
-#define NUM_LEDS    30  // do not change
+#define LED_PIN     6  
+#define COLOR_ORDER GRB  
+#define CHIPSET     WS2812B  
+#define NUM_LEDS    30  
 
-#define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
-#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
+#define BRIGHTNESS  150  
+#define FRAMES_PER_SECOND 10
 
-CRGB leds[NUM_LEDS];
+CRGB leds[NUM_LEDS]
 
 void setup() {
-  delay(1000); // sanity delay
+  delay(1000);
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
+  FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
-  PartyLights(); // run simulation frame
-  
-  FastLED.show(); // display this frame
+  PartyLights();
+  FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
 void PartyLights() {
-  // Fill the LEDs with a repeating pattern of green and purple
-  for (int i = 0; i < NUM_LEDS; i += 2) {
-    leds[i] = CRGB::Green; 
-    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Purple;
-  }
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Green;
 
-  // Optional: Add a twinkling effect
-  int brightness = 64;
-  for (int j = 0; j < NUM_LEDS; j++) {
-    if (random8() < 50) { // adjust the probability to control twinkling
-      leds[j] = CRGB::Black; // 'turn off' the LED randomly
-//      leds[j].maximizeBrightness(brightness); // do not use maximizeBrightness!
+    // Add a slow breathing effect by increasing and decreasing the brightness
+    int breathe = sin8(millis() / 2 + i * 5);
+
+    if (breathe < 128) {
+      leds[i].fadeToBlackBy(255 - breathe * 2);
+    } else {
+      leds[i].maximizeBrightness(breathe * 2 - 255);
     }
   }
 }
 ```
 
-Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.
+The color for the LEDs has been set to green. This color is being mixed with a breathing effect, which gives an appearance of the LEDs slowly pulsing on and off. This is done by having the brightness slowly increase and decrease in a sinusoidal way; sin() function is used to achieve this effect. The code also modifies the brightness depending on the value of the sine function to give the LEDs a 'breathing' effect. The timing for the sine function is done in such a way that each LED will be out of sync with its neighbors, giving a more dynamic appearance.

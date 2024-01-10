@@ -1,0 +1,49 @@
+Here's the modified C code snippet. This program will “celebrate the Welsh” by displaying a repeating pattern of red and green, which are the significant colors of the Welsh flag.
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30 
+
+#define BRIGHTNESS  150 
+#define FRAMES_PER_SECOND 5
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  WelshCelebration(); 
+  
+  FastLED.show(); 
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void WelshCelebration() {
+  for (int i = 0; i < NUM_LEDS; i += 2) {
+    leds[i] = CRGB::Red; 
+    if (i + 1 < NUM_LEDS){
+      leds[i + 1] = CRGB::Green;
+    }
+  }
+
+  int brightness = 64;
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 50) { 
+      leds[j] = CRGB::Black;
+    }
+  }
+}
+```
+The decision to modify the code this way is based on the significant colors of the Welsh flag, which are red and green. In the function `WelshCelebration()`, the LED strip will now light up in a pattern of red and green LEDs. The red and green cycle repeats along the length of the LED strip, simulating the color scheme of the Welsh flag.
+
+The twinkling or random black-out effect remains, giving a dynamic feel to the pattern, which can be interpreted as a 'celebration'. The rest of the code remains largely unchanged, as it is fundamental for the functioning of the LED strip using FastLED library.
+
+I chose to use the default values for brightness and frame rate, as the request did not specify any particular values for these parameters, and the prompt mentions using the best judgment when unsure about the values to use.

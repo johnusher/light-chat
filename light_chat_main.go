@@ -67,6 +67,116 @@ func MCIWorker(lpstrCommand string, lpstrReturnString string, uReturnLength int,
 	return i
 }
 
+func makeInoFromResponse(str string) string {
+
+	// generate .ino arduino file from ChatGPT response
+	// first we parse for valid Ccode, then we save this text as a .iso
+
+	char := "#include" // assume this is first line of C
+
+	index := strings.Index(str, char)
+	fmt.Println(index)
+	if index == -1 {
+		fmt.Printf("Character '%s' not found in the string.\n", char)
+		index = 1
+		return "bad"
+	}
+	trimmedStr := str[index:]
+
+	char = "```" // C code is wrapped in this code identifier like md format
+	index2 := strings.Index(trimmedStr, char)
+
+	if index2 > 0 {
+		trimmedStr = trimmedStr[:index2]
+	}
+
+	f, err := os.Create("duinoCode//duinoCode.ino")
+	if err != nil {
+		fmt.Println(err)
+		return "bad"
+	}
+	_, err = f.WriteString(trimmedStr)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return "bad"
+	}
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return "bad"
+	}
+
+	return trimmedStr
+
+}
+
+func createNewPromptFromBadCode(trimmedStr string, duinoCompErr string) string {
+	errorchar := "error:" // C code is wrapped in this code identifier like md format
+
+	// now fine which line contains an error message::
+	errorMsg := ""
+	numberOfErrors := 0
+	for _, line := range strings.Split(strings.TrimRight(duinoCompErr, "\n"), "\n") {
+		index := strings.Index(line, errorchar)
+		if index != -1 {
+			// log.Printf("line= %v", line)
+			indexError := strings.Index(line, errorchar)
+			if indexError != -1 {
+				errorMsg = errorMsg + "-" + line[indexError+len(errorchar):] // TODO: should use a map here
+				numberOfErrors = numberOfErrors + 1
+			}
+		}
+	}
+	log.Printf("errorMsg= %v", errorMsg)
+	log.Printf("numberOfErrors= %v", numberOfErrors)
+
+	errorPrompt1 := "Here is some C code for an Arduino using the FastLED library to create light patterns for an LED strip: \n ``` \n"
+
+	errorPrompt2 := ""
+	if numberOfErrors == 1 {
+		errorPrompt2 = "\n ``` \n The code does not compile. The compiler creates the following error message:\n"
+	} else {
+		errorPrompt2 = "\n ``` \n The code does not compile. The compiler creates the following " + string(numberOfErrors) + " error messages: \n"
+	}
+
+	// insert errorMsg
+
+	errorPrompt3 := "\n Please use this error message to modify the provided code so the modified code compiles. "
+
+	errorPrompt4 := "Please provide a response in C code. After the code please briefly explain the decision for your response.  \n "
+
+	errorPrompt5 := `
+Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
+2. Do not leave unimplemented code blocks in your response. 
+3. The only allowed library is fastLED. Do not import or use any other library.
+4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
+`
+
+	newErrorPromptStr := errorPrompt1 + trimmedStr + errorPrompt2 + errorMsg + errorPrompt3 + errorPrompt4 + errorPrompt5
+
+	f, err := os.Create("newErrorPromptStr.txt")
+	if err != nil {
+		fmt.Println(err)
+		return "bad"
+	}
+
+	_, err = f.WriteString(newErrorPromptStr)
+	if err != nil {
+		fmt.Println(err)
+		f.Close()
+		return "bad"
+	}
+
+	err = f.Close()
+	if err != nil {
+		fmt.Println(err)
+		return "bad"
+	}
+
+	return newErrorPromptStr
+}
+
 func main() {
 
 	log.Printf(" starting light-chat")
@@ -291,10 +401,25 @@ func main() {
 
 	var promptIntro string
 	if *resetChat {
-		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create a christmas effect on an LED strip. This is the existing pattern: \n ``` \n "
+		promptIntro = "Here is an example of C code for an Arduino using the FastLED library to create a christmas effect on an LED strip. This is the existing pattern: \n ``` \n "
 	} else {
-		promptIntro = "Here is an example C code for an Arduino using the FastLED library to create light patterns for an LED strip.  This is the existing pattern: \n ``` \n"
+		promptIntro = "Here is an example of C code for an Arduino using the FastLED library to create light patterns for an LED strip.  This is the existing pattern: \n ``` \n"
 	}
+
+	// duinoExamplePromptStr = "please update the code to make it look like disco lights flashing at 120 beats-per-minute."   // sanity check
+	duinoExamplePromptStr2 := "\n ``` \n Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. "
+
+	duinoExamplePromptStr3 := "Please provide a response in C code. After the code please briefly explain the decision for your response. Here is the request: \n "
+
+	// Response rules:
+	duinoExamplePromptStrFinal := `
+	Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
+	2. Do not leave unimplemented code blocks in your response. 
+	3. The only allowed library is fastLED. Do not import or use any other library.
+	4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
+	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
+	`
+	newPromptStr = promptIntro + duinoExamplePromptStr + duinoExamplePromptStr2 + duinoExamplePromptStr3 + newPrompt + duinoExamplePromptStrFinal
 
 	req2 := openai.ChatCompletionRequest{
 		// Model: openai.GPT3Dot5Turbo,   // select GPT3.5: not so great
@@ -302,55 +427,10 @@ func main() {
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: promptIntro,
+				Content: newPromptStr,
 			},
 		},
 	}
-	newPromptStr = promptIntro
-
-	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: duinoExamplePromptStr, // add example code
-	})
-
-	newPromptStr = newPromptStr + duinoExamplePromptStr
-
-	// duinoExamplePromptStr = "please update the code to make it look like disco lights flashing at 120 beats-per-minute."   // sanity check
-	duinoExamplePromptStr = "\n ``` \n Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. "
-
-	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: duinoExamplePromptStr,
-	})
-
-	newPromptStr = newPromptStr + duinoExamplePromptStr
-
-	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: newPrompt,
-	})
-
-	duinoExamplePromptStr = "Please provide a response in C code. After the code please briefly explain the decision for your response. Here is the request: \n "
-	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: duinoExamplePromptStr,
-	})
-
-	// Response rules:
-	duinoExamplePromptStrFinal := `
-	Remember: 1. Always format the code in code blocks.
-	2. Do not leave unimplemented code blocks in your response. Begin and end the new C code with the code block symbol of 3 backticks.
-	3. The only allowed library is fastLED. Do not import or use any other library.
-	4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
-	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
-	`
-
-	req2.Messages = append(req2.Messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: duinoExamplePromptStrFinal,
-	})
-
-	newPromptStr = newPromptStr + duinoExamplePromptStr + newPrompt + duinoExamplePromptStrFinal
 
 	f, err := os.Create("newPrompt.txt")
 	if err != nil {
@@ -371,6 +451,7 @@ func main() {
 		return
 	}
 
+	timeA := time.Now()
 	// look at https://pkg.go.dev/github.com/sashabaranov/go-openai@v1.17.9#section-readme
 
 	resp2, err := client.CreateChatCompletion(context.Background(), req2)
@@ -378,13 +459,15 @@ func main() {
 		fmt.Printf("ChatCompletion error: %v\n", err)
 	}
 
+	elapsedTime := time.Now().Sub(timeA)
 	log.Printf(" chatGPT response received")
+	log.Printf("elapsedTime = %v", elapsedTime)
 
 	//fmt.Println(resp)
 	// fmt.Println(resp.Choices[0].Message.Content)
 
 	responseContent := resp2.Choices[0].Message.Content
-	str = string(responseContent) // convert content to a 'string'
+	str = string(responseContent)
 
 	responseSn := newPrompt
 	responseSn = strings.Replace(responseSn, ".", "-", -1)
@@ -411,41 +494,12 @@ func main() {
 		return
 	}
 
-	char := "#include" // assume this is first line of C!
+	trimmedStr := makeInoFromResponse(str) // saves new .ino
 
-	index = strings.Index(str, char)
-	fmt.Println(index)
-	if index == -1 {
-		fmt.Printf("Character '%s' not found in the string.\n", char)
-		index = 1
-		return
-	}
-	trimmedStr := str[index:]
-
-	char = "```" // C code is wrapped in this code identifier like md format
-	index2 := strings.Index(trimmedStr, char)
-
-	if index2 > 0 {
-		trimmedStr = trimmedStr[:index2]
-	}
-
-	// fmt.Printf("trimmedStr: %v\n", trimmedStr)
-
-	f, err = os.Create("duinoCode//duinoCode.ino")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	_, err = f.WriteString(trimmedStr)
-	if err != nil {
-		fmt.Println(err)
-		f.Close()
-		return
-	}
-	err = f.Close()
-	if err != nil {
-		fmt.Println(err)
-		return
+	if trimmedStr == "bad" {
+		fmt.Println("problem saving .ino")
+	} else {
+		fmt.Println("saved new .ino")
 	}
 
 	// now compile and program the arduino board.
@@ -470,9 +524,85 @@ func main() {
 
 		err := c.Run()
 		if err != nil {
-			fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-			return
+			log.Printf("we have an error in the response- Duino code does not compile!")
+			// ask ChatGPT to modify the bad code to try and generate good code,
+			// according to the error message from Arduino-CLI:
+			duinoCompErr := stderr.String()
+			newErrorPromptStr := createNewPromptFromBadCode(trimmedStr, duinoCompErr)
+			// fmt.Println(newErrorPromptStr)
+
+			req_postErr := openai.ChatCompletionRequest{
+				// Model: openai.GPT3Dot5Turbo,   // select GPT3.5: not so great
+				Model: openai.GPT4, // GPT4 is default
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    openai.ChatMessageRoleUser,
+						Content: newErrorPromptStr,
+					},
+				},
+			}
+
+			fmt.Println("sending new prompt to correct error")
+			timeA := time.Now()
+			resp3, err := client.CreateChatCompletion(context.Background(), req_postErr)
+			if err != nil {
+				fmt.Printf("ChatCompletion error: %v\n", err)
+			}
+			// elapsed := timeA - time.Now()
+
+			elapsedTime := time.Now().Sub(timeA)
+
+			fmt.Println("ChatGPT response received- hopefully with error corrected")
+			log.Printf("elapsed= %v", elapsedTime)
+			responseContentPostErr := resp3.Choices[0].Message.Content
+			ErrStr := string(responseContentPostErr) // convert content to a 'string'
+
+			str = string(ErrStr)                   // convert content to a 'string'
+			trimmedStr := makeInoFromResponse(str) // saves new .ino
+
+			if trimmedStr == "bad" {
+				fmt.Println("problem saving error-corrected .ino")
+			} else {
+				fmt.Println("saved new error-corrected .ino")
+			}
+
+			// now compile and program the arduino board with error-corrected .ino
+
+			// select which arduino board are using:
+			if boardFlagType == 0 {
+				log.Printf("board is uno \n")
+				// c = exec.Command("arduino-cli.exe", "compile", "--fqbn", "arduino:avr:uno", "duinoCode\\duinoCode.ino")
+				c = exec.Command("arduino-cli.exe", "compile", "--fqbn", "arduino:avr:uno", "duinoCode\\duinoCode.ino", "-v")
+
+			} else {
+				log.Printf("board is atmega328  \n")
+				c = exec.Command("arduino-cli.exe", "compile", "--fqbn", "arduino:avr:diecimila:cpu=atmega328", "duinoCode\\duinoCode.ino")
+			}
+
+			fmt.Println(c)
+
+			var out bytes.Buffer
+			var stderr bytes.Buffer
+			c.Stdout = &out
+			c.Stderr = &stderr
+
+			err = c.Run()
+			if err != nil {
+				log.Printf("we have another error in the response- Duino code does not compile!")
+				// ask ChatGPT to modify the bad code to try and generate good code,
+				// according to the error message from Arduino-CLI:
+				// duinoCompErr := stderr.String()
+				os.Exit(3) // peace out
+			}
+
+			fmt.Println("new error-corrected code compiles!")
+
+		} else {
+			fmt.Println("code compiles!")
+
 		}
+
+		fmt.Println("program the board")
 		fmt.Println("Result: " + out.String())
 
 		if boardFlagType == 0 {

@@ -1,3 +1,5 @@
+Here is the modified C code:
+```c
 #include <FastLED.h>
 
 #define LED_PIN     6  
@@ -74,3 +76,12 @@ void FinalFlash(){
     color_loop = 0;  // reseting color_loop for next cycle
   }
 }
+```
+
+Here's a breakdown of the new code:
+1. A new MoveDot function is added that handles moving a blue dot along the strip, turning it yellow and making it bounce off the end.
+2. The speed of the dot is increased as it moves along.
+3. When the dot turns around it gradually slows down due to the decrease in speed variable.
+4. The function also implements a flashing effect by constantly turning the LED on and off.
+5. A FinalFlash function has been added that flashes the whole LED strip white 4 times when the dot returns to the beginning.
+6. The function also restarts the motion and turns the lights more and more random per given request.
