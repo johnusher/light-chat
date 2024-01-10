@@ -1,11 +1,10 @@
 # light-chat
-* Light-chat is a Chat-GPT enabled system to control of a strip of programmable LEDs using a text or voice prompt. For speech to text we use the OpenAI Whisper API. To program the LEDs we use an Arduino. The user prompt will generate new Arduino code to modify the existing light pattern or to generate a new pattern.
+* Light-chat is a Chat-GPT enabled system to control a strip of programmable LEDs using a text or voice prompt. For speech to text we use the OpenAI Whisper API. To program the LEDs we use an Arduino. The user prompt will generate new Arduino code to modify the existing light pattern or to generate a new pattern.
 
 * We sometimes get invalid code from the ChatGPT response. We use the response from the Arduino compiler ```arduino-cli compile ``` to extract error messages and resend the invalid code and the error message to ChatGPT to get new and (hopefully) valid code.<br />
 
 * This is a Golang and Arduino project using the Go openAI interface library [https://github.com/sashabaranov/go-openai](https://github.com/sashabaranov/go-openai) and the FastLED library [https://github.com/FastLED](https://github.com/FastLED).
 
-* The project has been tested with Windows OS.
 
 
 
@@ -29,7 +28,29 @@ In summary: Use this -r flag when you want to reset the light pattern and make a
 
 # Examples
 
-### 1.
+### 1. Barbie's dream house
+
+[![Watch the video]![Alt text](video/bdh.png)](https://youtube.com/shorts/Lj5bpjEMJQU?feature=shared)
+
+(In the video, the prompt was repeated just before the Arduino updated the lights.)
+
+Response:<br /> 
+
+[Barbie's dream house](<responseHistory/Please it Barbie's dream house-.txt>)
+
+
+```
+Here is a modified code that displays a Barbie's Dream House themed light pattern by alternating between pink, cyan, and white lights, which imitates the traditional color scheme of Barbie. ++ It briefly flashes all LEDs red twice at the initial setup as requested ++ . 
+```
+Note this is an incorrect interpretation of rule #5:
+```
+	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
+
+```
+
+
+
+### 2. 420 Party.
 ```
 go run .\light_chat_main.go -p "Make the colours suitable for a party 
 at 420 wink-wink nudge-nudge say no more" -nb -r 
@@ -41,7 +62,7 @@ This uses a text prompt input, with no Arduino board connected, and using the de
  We add "response rules" to ask ChatGPT to describe how it interpretted the prompt. For the above example, this is the comment it generated on the code:<br /> 
 ```Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.```
 
-### 2.
+### 3. More Romantic.
  ``` 
  go run .\light_chat_main.go -p "Now make the lights more romantic." -nb
  ```
@@ -52,7 +73,7 @@ This is the ChatGPT comment on the code:<br />
  The above code will create a "romantic" atmosphere by decreasing the brightness to a soft glow (80 out of 255). It also slows down the frame rate to a calm 2 frames per second. Most importantly, it sets all the LEDs to red (CHSV(0, 255, 255) is a hue-saturation-value representation of the color red), which is traditionally associated with romance.
  ```
 
-### 3
+### 4. Age of Aquarius.
 ```
 I would like a monochrome black and white interpretation of the song Age of Aquarius
 ```
@@ -60,13 +81,15 @@ I would like a monochrome black and white interpretation of the song Age of Aqua
 Response: [here](<responseHistory/I would like a monochrome black and white interpretation of the song Age of Aquarius.txt>)<br /> 
 The C code did not compile first time- it used an undefined parameter HALF. But the response did not lack in ambition nor inventive interpretation :)
 
-We have a function ```createNewPromptFromBadCode``` to use ChatGPT to amend such bad code so that it compiles: the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code, and asks it to correct the bad code so it compiles. If we again get "bad" code, we abort.
+the function ```createNewPromptFromBadCode``` uses ChatGPT to modify such non-compilable "bad" code: the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code, and asks it to correct the bad code so it compiles. If we again get "bad" code, we abort.
 
 
-### 4
+### 5. ... it's kinda complicated...
 ```Please make the lights display a single blue dot that travels down the light strip starting slow and speeding up as it travels. When the blue dot reaches the end turn it to a single yellow light that reflects and returns along the light strip slowly and flashing. When it reaches the end flash all lights bright white 4 times and then repeat this pattern but with the colours becoming more and more random.```
 
-This took 1.4 minutes to receive a response and the code did not compile first time. But using the ```createNewPromptFromBadCode``` function, the new code compiled.
+This took 1.4 minutes to receive a response and the code compiled first time. 
+
+
 
 # How it works
 1. Obtain desired new or ammended light pattern using a text or microphone recording and convert speech to text using the OpenAI Whisper api.

@@ -44,7 +44,7 @@ void ChristmasLights() {
 }
  ``` 
  Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. Please provide a response in C code. After the code please briefly explain the decision for your response. Here is the request: 
- Please make the lights display a single blue dot that travels down the light strip starting slow and speeding up as it travels. When the blue dot reaches the end turn it to a single yellow light that reflects and returns along the light strip slowly and flashing. When it reaches the end flash all lights bright white 4 times and then repeat this pattern but with the colours becoming more and more random.
+ Please it Barbie's dream house.
 	Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
 	2. Do not leave unimplemented code blocks in your response. 
 	3. The only allowed library is fastLED. Do not import or use any other library.
