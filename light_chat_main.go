@@ -344,7 +344,6 @@ func main() {
 		// fmt.Println("hit key")
 
 		fmt.Println("8 second wait")
-
 		time.Sleep(8 * time.Second)
 
 		n := 1

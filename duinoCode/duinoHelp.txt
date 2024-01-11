@@ -4,7 +4,7 @@ https://arduino.github.io/arduino-cli/0.21/getting-started/
 1. compile
 cd C:\Users\john\Dropbox\code\github\light-chat\duinoCode
 
-arduino-cli.exe compile --fqbn arduino:avr:diecimila:cpu=atmega328 \\duinoCode\\duinoCode.ino -v
+arduino-cli.exe compile --fqbn arduino:avr:uno duinoCode\\duinoCode.ino -v
 
 ./arduino-cli core update-index
 
