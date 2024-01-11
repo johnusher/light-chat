@@ -2,8 +2,8 @@
 
 #define LED_PIN     6  // do not change
 #define COLOR_ORDER GRB  // do not change
-#define CHIPSET     WS2812B   // do not change
-#define NUM_LEDS    30  // do not change
+#define CHIPSET     WS2812B   // LED chipset. do not change
+#define NUM_LEDS    30  // length of the light strip. number of LEDs in the light strip. do not change
 
 #define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
 #define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
@@ -11,7 +11,7 @@
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(1000); // sanity delay
+  delay(1000); // delay before we start
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
 }

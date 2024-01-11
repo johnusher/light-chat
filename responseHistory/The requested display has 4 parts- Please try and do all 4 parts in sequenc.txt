@@ -1,0 +1,83 @@
+Here is the modified code:
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6  
+#define COLOR_ORDER GRB  
+#define CHIPSET     WS2812B  
+#define NUM_LEDS    30  
+
+#define BRIGHTNESS  150   
+#define FRAMES_PER_SECOND 30  
+#define FLASH_DELAY 400
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  
+}
+
+void loop() {
+  Part1();
+  Part2();
+  Part3();
+  Part4();
+}
+
+void Part1() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Blue;
+    FastLED.show();
+    delay(200 - (i * 6)); 
+    leds[i] = CRGB::Black;
+  }
+}
+
+void Part2() {
+  leds[NUM_LEDS - 1] = CRGB::Yellow;
+  FastLED.show();
+  delay(2000);
+}
+
+void Part3() {
+  for (int i = NUM_LEDS - 1; i >= 0; i--) {
+    leds[i] = CRGB::Yellow;
+    FastLED.show();
+    delay(200); 
+    if (random8() < 60) {
+      leds[i] = CRGB::Yellow;
+    } else {
+      leds[i] = CRGB::Black;
+    }
+  }
+}
+
+void Part4() {
+  for (int i = 0; i < 4; i++){
+    fill_solid(leds, NUM_LEDS, CRGB::White);
+    FastLED.show();
+    delay(FLASH_DELAY);
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
+    FastLED.show();
+    delay(FLASH_DELAY);
+  }
+}
+```
+The code has been restructured into 4 different parts according to the requested display. Each part corresponds to one stage of the display, namely Part1(), Part2(), Part3(), and Part4().
+
+Part1(): The blue dot moves from the start to the end of the light-strip, speed increasing as it moves. This effect is achieved by reducing the delay time for each dot.
+
+Part2(): The last LED now becomes yellow. It stays lit for 2 seconds (2000ms).
+
+Part3(): The yellow dot "returns" along the light strip, randomly blinking on its way back.
+
+Part4(): The LEDs flash bright white, 4 times. This is achieved by filling all the LEDs with white, then wait for a period (FLASH_DELAY), then turning all the LEDs off, and repeat.
+
+Note: The value of FLASH_DELAY can be tuned to adjust the flashing frequency. We set the value to 400ms for a prominent flashing effect. The exact duration may depend on the actual application requirements.
+
+Remember that since these are LEDs, it doesn't literally "move". We give the illusion of movement by lighting up the next one and turning off the current one. 
+
+Remember to connect the data of the LED strip to the right PIN of the Arduino and ensure that FastLED library is installed in your Arduino IDE.

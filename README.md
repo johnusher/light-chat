@@ -28,6 +28,8 @@ In summary: Use this -r flag when you want to reset the light pattern and make a
 
 # Examples
 
+Previous examples are stored here in directory [ /responseHistory](responseHistory)
+
 ### 1. Barbie's dream house
 
 [![Watch the video]![Alt text](video/bdh.png)](https://youtube.com/shorts/Lj5bpjEMJQU?feature=shared)
@@ -43,21 +45,7 @@ Response:<br />
 Note this last part ++ xxx ++ is an incorrect interpretation of rule #5:<br /> 
 ```	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.```
 
-
-
-### 2. 420 Party.
-```
-go run .\light_chat_main.go -p "Make the colours suitable for a party 
-at 420 wink-wink nudge-nudge say no more" -nb -r 
-```
-This uses a text prompt input, with no Arduino board connected, and using the default reference code in xmasTwinkleDuino.c.
-
- The ChatGPT response is stored in directory [responseHistory](responseHistory) as a text file with filename the same as the user prompt for the light pattern -  [example for above](<responseHistory/Make the colours suitable for an adult 4-20 party nudge-nudge wink-wink say.txt>).<br /> 
-
- We add "response rules" to ask ChatGPT to describe how it interpretted the prompt. For the above example, this is the comment it generated on the code:<br /> 
-```Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.```
-
-### 3. More Romantic.
+### 2. More Romantic.
  ``` 
  go run .\light_chat_main.go -p "Now make the lights more romantic." -nb
  ```
@@ -66,19 +54,38 @@ This is the ChatGPT comment on the code:<br />
 
 ``` The above code will create a "romantic" atmosphere by decreasing the brightness to a soft glow (80 out of 255). It also slows down the frame rate to a calm 2 frames per second. Most importantly, it sets all the LEDs to red (CHSV(0, 255, 255) is a hue-saturation-value representation of the color red), which is traditionally associated with romance. ```
 
-### 4. Age of Aquarius.
+### 3. Age of Aquarius.
 ```I would like a monochrome black and white interpretation of the song Age of Aquarius.```
 
 Response: [here](<responseHistory/I would like a monochrome black and white interpretation of the song Age of Aquarius.txt>)<br /> 
 The C code did not compile first time- it used an undefined parameter HALF. But the response did not lack in ambition nor inventive interpretation :)
 
-the function ```createNewPromptFromBadCode``` uses ChatGPT to modify such non-compilable "bad" code: the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code, and asks it to correct the bad code so it compiles. If we again get "bad" code, we abort.
+The function ```createNewPromptFromBadCode``` uses ChatGPT to modify such non-compilable "bad" code: the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code, and asks it to correct the bad code so it compiles. If we again get "bad" code, we abort.
+
+### 4. 420 Party.
+```go run .\light_chat_main.go -p "Make the colours suitable for a party at 420 wink-wink nudge-nudge say no more" -nb -r ```
+This uses a text prompt input, with no Arduino board connected, and using the default reference code in xmasTwinkleDuino.c.
+
+ The ChatGPT response is stored in directory [responseHistory](responseHistory) as a text file with filename the same as the user prompt for the light pattern -  [example for above](<responseHistory/Make the colours suitable for an adult 4-20 party nudge-nudge wink-wink say.txt>).<br /> 
+
+ We add "response rules" to ask ChatGPT to describe how it interpretted the prompt. For the above example, this is the comment it generated on the code:<br /> 
+```Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.```
 
 
-### 5. ... it's kinda complicated...
-```Please make the lights display a single blue dot that travels down the light strip starting slow and speeding up as it travels. When the blue dot reaches the end turn it to a single yellow light that reflects and returns along the light strip slowly and flashing. When it reaches the end flash all lights bright white 4 times and then repeat this pattern but with the colours becoming more and more random.```
+### 5. Football world cup final 1966.
+```  go run .\light_chat_main.go -p "Over a period of 1 minute, represent the score of the football world cup final 1966. Red to represent England." -r```
 
-This took 1.4 minutes to receive a response and the code compiled first time. 
+
+### 6. ... it's a bit complicated...
+```  go run .\light_chat_main.go -p "The requested display has 4 parts. Please try and do all 4 parts in sequence. Part 1: Display a single blue dot that moves down the lightstrip starting slow and speeding up as it moves. Part 2: When the blue dot reaches the end of the lightstrip turn it to a single yellow dot. Part 3: The yellow dot reflects and returns along the length of the lightstrip slowly flashing. Part 4: When the yellow dot reaches the end of the lightstrip flash all lights bright white 4 times." -r```
+
+[![Watch the video]![Alt text](https://img.youtube.com/vi/qWUva9C1Yjc/0.jpg)](https://youtu.be/qWUva9C1Yjc?feature=shared
+)
+
+
+This took 1min42 seconds to receive a response and the code compiled first time. <br /> 
+It got it mostly right, except for the part 3. For some reason, in the  [response](<responseHistory/Display a single blue dot that moves down the lightstrip starting slow and .txt>) ChatGPT4 makes the yellow dot randomly blink:<br /> 
+```Part3(): The yellow dot "returns" along the light strip, randomly blinking on its way back.```
 
 
 

@@ -1,3 +1,4 @@
+```c
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -8,32 +9,26 @@
 #define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
 #define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
 
-#define SCORE_ENGLAND 4   // England's final score in 1966 World cup final 
-
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(1000); // 1 sec delay before we start
+  delay(1000); // delay before we start
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
 }
 
 void loop() {
-  WorldCupScore(); // run simulation frame
-
+  MakeItAllRed(); // make all LEDs red
+  
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void WorldCupScore() {
-  // light up SCORE_ENGLAND number of LEDs in red color for 1/4 minute each 
-  for (int i = 0; i < SCORE_ENGLAND; i++) {
-    leds[i] = CRGB::Red;
-    FastLED.show(); 
-    delay( (60000 / SCORE_ENGLAND) / 4); // delay for 1/4 minute for each goal
+void MakeItAllRed() {
+  // Fill the LEDs with red
+  for (int i = 0; i < NUM_LEDS; i ++) {
+    leds[i] = CRGB::Red; 
   }
-  
-  // clear all LEDs and wait for remaining 3/4 minute
-  for (int i = 0; i < NUM_LEDS; i++) { leds[i] = CRGB::Black; }
-  delay(60000 / 4 * 3); // delay for remaining 3/4 minute
 }
+```
+This code replaces the existing `ChristmasLights()` function with a new `MakeItAllRed()` function that sets all of the LEDs to red. The `setup()` and `loop()` functions are the same as before, but the `loop()` function now calls `MakeItAllRed()` instead of `ChristmasLights()`. This is because the request was to "make it all red", so we want to fill the entire strip with red LEDs. The `MakeItAllRed()` function uses a simple for loop to accomplish this, setting every LED to red by using the `CRGB::Red` color defined in the FastLED library.

@@ -1,3 +1,6 @@
+Here is the C code that represents England's score from the 1966 football world cup final over a period of 1 minute.
+
+```C
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -37,3 +40,6 @@ void WorldCupScore() {
   for (int i = 0; i < NUM_LEDS; i++) { leds[i] = CRGB::Black; }
   delay(60000 / 4 * 3); // delay for remaining 3/4 minute
 }
+```
+
+This program starts by lighting up one LED at a time in red color to represent a goal by England until all 4 goals are represented. Each goal is represented for 1/4 minute. After all 4 goals have been represented, all the LEDs are cleared (switched off) and the Arduino waits for the remaining 3/4 minute before starting to represent the goals again.

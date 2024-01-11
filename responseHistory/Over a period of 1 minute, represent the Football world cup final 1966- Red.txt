@@ -1,0 +1,59 @@
+ ``` 
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 1   // Modified frames per second to one frame each second for the 60 seconds.
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  // For the first minute represent the Football World Cup final 1966
+  static unsigned long lastUpdate = 0;  // Keep track when we last updated the display
+  if (millis() - lastUpdate >= 60000) {    // If a minute has passed since last update
+    lastUpdate = millis();
+    FootballWorldCup1966();    // Display the Football World Cup final 1966
+  }
+  else {
+    // Display regular Christmas Lights
+    ChristmasLights();
+  }
+  
+  FastLED.show(); // display this frame
+  
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void FootballWorldCup1966() {
+  // Fill all LEDs with red to represent England
+  fill_solid(leds, NUM_LEDS, CRGB::Red);
+}
+
+void ChristmasLights() {
+  // Fill the LEDs with a repeating pattern of red, green, and white
+  for (int i = 0; i < NUM_LEDS; i += 3) {
+    leds[i] = CRGB::Red;
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Green;
+    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB::White;
+  }
+
+  // Optional: Add a twinkling effect
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 50) { 
+      leds[j] = CRGB::Black; 
+    }
+  }
+}
+```
+
+I created a separate function `FootballWorldCup1966()` to represent the event. This function fills all the LEDs with red for England. In the `loop()` function, I used a conditional structure to switch between the ChristmasLights and the Football World Cup effect. This structure checks if a minute has passed since the pattern last changed. If yes, it displays the Football World Cup final 1966 effect for a minute.

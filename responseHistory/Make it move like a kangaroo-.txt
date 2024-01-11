@@ -1,0 +1,57 @@
+Here is the modified code:
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 5
+
+CRGB leds[NUM_LEDS];
+
+int current_led = 0;  // Tracks the moving "kangaroo" effect
+int direction = 1;  // Determines the direction of the effect
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  KangarooEffect();  // Run simulation frame
+  FastLED.show(); // Display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void KangarooEffect() {
+  // "Jumping" effect like a kangaroo
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if (i == current_led) {
+      leds[i] = CRGB::Red;  // The "kangaroo" is red
+    } else {
+      leds[i] = CRGB::Black;  // Other positions are off
+    }
+  }
+
+  if(direction == 1) {  // Moving forward
+    if(current_led < NUM_LEDS - 1) { 
+      current_led++;
+    } else {  // Reached end of strip. Change direction
+      direction = -1;
+    }
+  } else {  // Moving backward
+    if(current_led > 0) { 
+      current_led--;
+    } else {  // Reached start of strip. Change direction
+      direction = 1;
+    }
+  }
+}
+```
+
+This code creates a moving "kangaroo hop" effect by lighting up 1 red LED at a time and moving it along the light strip, bouncing back when it reaches the end, like a kangaroo moving back and forth. We maintain the current LED position (`current_led`) and the direction of movement (`direction`), then use these to create the bouncing effect. The other LEDs are turned off (Black), so we see only the moving red LED, which gives the appearance of a 'hopping' light. Note that we run this effect in the main loop using `KangarooEffect()` function. This is a simple, abstract interpretation of a kangaroo's movement given the constraints of the lighting system.

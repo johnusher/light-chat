@@ -328,20 +328,25 @@ func main() {
 
 		// following wait method is unreliable for saving wav file:
 
-		input := make(chan rune, 1)
-		fmt.Println("recording mic \n")
-		fmt.Println("hit keyboard return to finish \n")
+		// input := make(chan rune, 1)
+		// fmt.Println("recording mic \n")
+		// fmt.Println("hit keyboard return to finish \n")
 
-		// wait for enter key to finish microphone recording
-		go readKey(input)
-		select {
-		case <-input:
+		// // wait for enter key to finish microphone recording
+		// go readKey(input)
+		// select {
+		// case <-input:
 
-		case <-time.After(18000 * time.Millisecond):
-			fmt.Println("Time out!")
-		}
+		// case <-time.After(18000 * time.Millisecond):
+		// 	fmt.Println("Time out!")
+		// }
 
-		fmt.Println("hit key")
+		// fmt.Println("hit key")
+
+		fmt.Println("8 second wait")
+
+		time.Sleep(8 * time.Second)
+
 		n := 1
 		for n < 850 { // try many times to save file
 			i = MCIWorker("save capture mic.wav", "", 0, 0)

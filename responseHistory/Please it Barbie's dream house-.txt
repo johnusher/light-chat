@@ -1,6 +1,4 @@
-Here is a modified code that displays a Barbie's Dream House themed light pattern by alternating between pink, cyan, and white lights, which imitates the traditional color scheme of Barbie. It briefly flashes all LEDs red twice at the initial setup as requested. 
-
-```C
+```
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -9,7 +7,7 @@ Here is a modified code that displays a Barbie's Dream House themed light patter
 #define NUM_LEDS    30  // do not change
 
 #define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
-#define FRAMES_PER_SECOND 10   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
+#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
 
 CRGB leds[NUM_LEDS];
 
@@ -17,31 +15,20 @@ void setup() {
   delay(1000); // sanity delay
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
-  
-  // Initial setup: flash all LEDs red twice 
-  FastLED.showColor(CRGB::Red);
-  delay(500);
-  FastLED.showColor(CRGB::Black);
-  delay(500);
-  FastLED.showColor(CRGB::Red);
-  delay(500);
-  FastLED.showColor(CRGB::Black);
-  delay(500);
 }
 
 void loop() {
-  BarbieLights(); // run simulation frame
+  BarbieDreamHouse(); // run simulation frame
   
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void BarbieLights() {
-  // Fill the LEDs with a repeating pattern of pink, cyan, and white
-  for (int i = 0; i < NUM_LEDS; i += 3) {
+void BarbieDreamHouse() {
+  // Fill the LEDs with a repeating pattern of pink and white
+  for (int i = 0; i < NUM_LEDS; i += 2) {
     leds[i] = CRGB::Pink; 
-    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Cyan;
-    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB::White;
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::White;
   }
 
   // Optional: Add a twinkling effect
@@ -49,10 +36,8 @@ void BarbieLights() {
   for (int j = 0; j < NUM_LEDS; j++) {
     if (random8() < 50) { // adjust the probability to control twinkling
       leds[j] = CRGB::Black; // 'turn off' the LED randomly
-//      leds[j].maximizeBrightness(brightness); // do not use maximizeBrightness!
     }
   }
 }
-``` 
-
-In this code, the ChristmasLights() function was replaced with the BarbieLights() function that sets the LED colors to pink, cyan, and white in line with the traditional Barbie colors. Also, additional lines have been added to the setup() function to flash all LEDs red twice. All other requested conditions were met, and the original code structure was preserved where possible.
+```
+This modified C code changes the LED Strip to display a Barbie DreamHouse theme. It replaces the original red and green colors with pink and white respectively to create a typical Barbie color scheme. The twinkling effect has been retained, causing some LEDs to randomly turn off, creating a dynamic lighting effect that adds depth to the vibrant pink and white colors. This code still sticks to the FastLED library as instructed.

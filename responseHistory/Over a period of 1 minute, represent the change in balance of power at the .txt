@@ -1,0 +1,51 @@
+Sure, here's a simple implementation where we increase the number of blue LEDs over a one minute period to represent the changing power balance:
+
+C code:
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6  // do not change
+#define COLOR_ORDER GRB  // do not change
+#define CHIPSET     WS2812B   // LED chipset. Do not change
+#define NUM_LEDS    30  // length of the light strip. Number of LEDs in the light strip. Do not change
+
+#define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
+#define FRAMES_PER_SECOND 1   // We are now doing 1 frame per second
+
+CRGB leds[NUM_LEDS];
+int blueLeds = 0; // Number of blue LEDs (representing other team) 
+long previousMillis = 0; // We'll use this to track elapsed time
+
+void setup() {
+  delay(1000); // delay before we start
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= 1000) {
+    previousMillis = currentMillis;
+    blueLeds = min(blueLeds + 1, NUM_LEDS);
+  }
+  
+  WaterlooBattle(); // run simulation frame
+  
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void WaterlooBattle() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if (i < blueLeds) {
+      leds[i] = CRGB::Blue; // Other team's power grows
+    } else {
+      leds[i] = CRGB::Red; // Reducing Napoleon's power
+    }
+  }
+}
+```
+
+Explanation:
+This implementation uses the 'millis' function to track elapsed time and increment the number of blue LEDs every second. That means the battle, represented over one minute (60 seconds), will display an increasing amount of blue LEDs and a decreasing amount of red LEDs as the time goes by. This approximates the change in balance of power over the duration of the battle of Waterloo.

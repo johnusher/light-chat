@@ -1,0 +1,49 @@
+Here's how you might represent the change in balance of power at the Battle of Waterloo:
+
+```C
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    60
+
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 5
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(3000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  WaterlooLights();
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void WaterlooLights() {
+  int half = NUM_LEDS / 2;
+  int time = millis() / 1000; // Converts the milliseconds into seconds
+  int elapsed = time % 60; // Modulo to reset every minute
+
+  int boundary = map(elapsed, 0, 60, 0, half); // Map elapsed time to a boundary
+
+  // LEDs [0, boundary] are red, for Napoleon
+  for (int i = 0; i < boundary; i++) {
+    leds[i] = CRGB::Red;
+  }
+
+  // LEDs [boundary, NUM_LEDS] are blue, for Allies
+  for (int i = boundary; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Blue;
+  }
+}
+
+```
+By using the time elapsed during the minute and a simple animation loop, this code creates a time-based visualisation where the boundary between red (Napolean) and blue (Allies) moves according to the time elapsed. At the minute's start, the LEDs are all red, indicating Napolean's power. As the minute progresses, blue (representing the Allies) gradually takes over. At the end of the minute, the lights should be all blue, reflecting the outcome of the battle. The lights then reset to all red at the beginning of the next minute to start the cycle anew.   
+
+This situation is based on the historical fact that the Battle of Waterloo progressively turned against Napoleon, with the Allies gaining the upper hand over time.
