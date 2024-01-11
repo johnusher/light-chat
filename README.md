@@ -91,9 +91,7 @@ This uses a text prompt input, with no Arduino board connected, and using the de
 
 
 ### 5. ... it's kinda complicated...
- ```bash 
-   go run .\light_chat_main.go -p "The requested display has 4 parts. Please try and do all 4 parts in sequence. Part 1: Display a single blue dot that moves down the lightstrip starting slow and speeding up as it moves. Part 2: When the blue dot reaches the end of the lightstrip turn it to a single yellow dot. Part 3: The yellow dot reflects and returns along the length of the lightstrip slowly flashing. Part 4: When the yellow dot reaches the end of the lightstrip flash all lights bright white 4 times." -r
-   ```
+ ```bash go run .\light_chat_main.go -p "The requested display has 4 parts. Please try and do all 4 parts in sequence. Part 1: Display a single blue dot that moves down the lightstrip starting slow and speeding up as it moves. Part 2: When the blue dot reaches the end of the lightstrip turn it to a single yellow dot. Part 3: The yellow dot reflects and returns along the length of the lightstrip slowly flashing. Part 4: When the yellow dot reaches the end of the lightstrip flash all lights bright white 4 times." -r ```
 
 [![Watch the video]![Alt text](https://img.youtube.com/vi/qWUva9C1Yjc/0.jpg)](https://youtu.be/qWUva9C1Yjc?feature=shared
 )
