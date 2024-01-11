@@ -90,7 +90,7 @@ This uses a text prompt input, with no Arduino board connected, and using the de
 ```Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.```
 
 
-### 5. ... it's a bit complicated...
+### 5. ... it's kinda complicated...
  ```bash 
    go run .\light_chat_main.go -p "The requested display has 4 parts. Please try and do all 4 parts in sequence. Part 1: Display a single blue dot that moves down the lightstrip starting slow and speeding up as it moves. Part 2: When the blue dot reaches the end of the lightstrip turn it to a single yellow dot. Part 3: The yellow dot reflects and returns along the length of the lightstrip slowly flashing. Part 4: When the yellow dot reaches the end of the lightstrip flash all lights bright white 4 times." -r
    ```
