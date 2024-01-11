@@ -23,7 +23,7 @@ flags:<br />
 -p "make lights kinda blue"= text prompt input. If we do not use this p flag then we default to use voice input with the default microphone.<br /> 
 -r (bool) reset the reference (provided example) light pattern code to [xmasTwinkleDuino.c](xmasTwinkleDuino.c). This file contains information about the programable LED strip chipset (currently WS2812B), the number of LEDs on the strip, and which Arduino pin to use for the data output.<br /> 
 If the flag is not used, the reference (provided example) light pattern code is [duinoCode.ino](duinoCode/duinoCode.ino).<br /> 
-In summary: Use this -r flag when you want to reset the light pattern and make a new one (e.g. "make a new calm light pattern that is a poem by John Donne"). Otherwise do not use the flag to modify whatever the exisiting pattern is (e.g. "make the light pattern less romantic"). <br /> 
+In summary: Use this -r flag when you want to reset the light pattern and make a new one (e.g. "make a new calm light pattern that is inspired by the poet John Donne"). Otherwise do not use the flag to modify whatever the existing pattern is (e.g. "make the light pattern less romantic"). <br /> 
  -nb (bool) = no board. Use this flag if no Arduino is connected but you still want to generate a response that is saved in directory [responseHistory](responseHistory).  <br /> 
 
 # Examples
@@ -34,7 +34,7 @@ Previous examples are stored here in directory [ /responseHistory](responseHisto
 
 [![Watch the video]![Alt text](video/bdh.png)](https://youtube.com/shorts/Lj5bpjEMJQU?feature=shared)
 
-(In the video, the prompt was repeated just before the Arduino updated the lights.)
+(The example in the video used an early version of the system with a different codeload than discussed below. The prompt was repeated just before the Arduino updated the lights.)
 
 Response:<br /> 
 
