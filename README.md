@@ -89,6 +89,15 @@ This uses a text prompt input, with no Arduino board connected, and using the de
  We add "response rules" to ask ChatGPT to describe how it interpretted the prompt. For the above example, this is the comment it generated on the code:<br /> 
 ```Your ChristmasLights function was replaced by the PartyLights function. The colours were changed from a repeating pattern of red, green, white to green and purple. For a 4-20 themed party these colours are more suitable as green often represents marijuana and purple represents the feeling of relaxation and royalty.```
 
+### 5. Trippy.
+ ```bash 
+go run .\light_chat_main.go -p "make a new pattern: trip zone for Burning Man." -r
+ ```
+
+  ```bash 
+  go run .\light_chat_main.go -p "make the motion of the existing pattern slower and a bit more random." 
+  ```
+
 
 ### 5. ... it's a bit complicated...
  ```bash 

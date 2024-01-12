@@ -2,79 +2,39 @@ Here is some C code for an Arduino using the FastLED library to create light pat
  ``` 
 #include <FastLED.h>
 
-#define LED_PIN     6  // do not change
-#define COLOR_ORDER GRB  // do not change
-#define CHIPSET     WS2812B   // LED chipset. do not change
-#define NUM_LEDS    30  // length of the light strip. number of LEDs in the light strip. do not change
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
 
-#define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
-#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 120
 
 CRGB leds[NUM_LEDS];
-int currentLED = 0;
-int direction = 1;
-int flashCount = 0;
-bool flashing = false;
 
 void setup() {
+  delay(1000);
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
+  FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
-  if(flashing) {
-    flashLights();
-    if(flashCount < 4) {
-      flashCount++;
-    } else {
-      flashCount = 0;
-      flashing = false;
-    }
-  } else {
-    moveDot();
-  }
-  FastLED.show(); // display this frame
+  TripZone();
+  
+  FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void moveDot() {
-  if (direction == 1) {
-    if (currentLED < NUM_LEDS) {
-      FastLED.clear();
-      leds[currentLED] = CRGB::Blue;
-      currentLED++;
-      FRAMES_PER_SECOND += 1;
-    } else {
-      direction = -1;
-      currentLED = NUM_LEDS - 1;
-    }
-  } else {
-    if (currentLED >= 0) {
-      FastLED.clear();
-      leds[currentLED] = CRGB::Yellow;
-      currentLED--;
-      flashyLights();
-      FRAMES_PER_SECOND -= 1;
-    } else {
-      direction = 1;
-      currentLED = 0;
-      flashing = true;
-    }
+void TripZone() {
+  static uint8_t hue = 0;
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CHSV(hue++, 255, 255);
   }
 }
 
-void flashLights() {
-  for(int i=0; i<NUM_LEDS; i++)
-    leds[i] = (flashCount % 2) ? CRGB::White : CRGB::Black;
-}
-
-void flashyLights() {
-  if(random8() < 50) leds[currentLED] = CRGB::Black;
-}
-
  ``` 
- The code does not compile. The compiler creates the following  error messages: 
-- lvalue required as left operand of assignment- lvalue required as left operand of assignment
+ The code does not compile. The compiler creates the following  error messages: 
+- redefinition of 'CRGB leds [30]'- redefinition of 'void setup()'- redefinition of 'void loop()'
  Please use this error message to modify the provided code so the modified code compiles. Please provide a response in C code. After the code please briefly explain the decision for your response.  
  
 Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.

@@ -14,14 +14,21 @@ package main
 // -r (bool) reset reference light pattern to xmasTwinkleDuino.c
 // -nb (bool) = no-board: (no Arduino connected). A response is still generated in
 
-// Using a voice or text prompt, we program a strip of Arduino-controlled LEDs.
-
-// 1. Obtain desired new or ammended light pattern - use text or ...
-//    ... listen to microphone and convert speech to text using online chatgpt whisper api
-// 3. create new prompt to replace or update light pattern according.
-// 4. Send new prompt to chatgpt
-// 5. Receive ChatGPT response, parse for valid Arduino C code.
-// 6. Compile new light pattern and program Arduino (using Ardunio-CLI).
+// Obtain desired new or ammended light pattern using a text or microphone recording
+//  and convert speech to text using the OpenAI Whisper api.
+// 1. Create a new prompt to replace or update the light pattern accordingly.
+// We concat the following text:
+// "Here is an example of C code for an Arduino using the FastLED library p etc"
+// < insert C code from example reference >
+// " Please generate new C code to satisfy the following request and output the modified code in its entirety: "
+// < user prompt >
+// "These are the rules:"
+// < 1. Always format the code in code blocks. etc...>
+// 2. Send this new prompt to ChatGPT.
+// 3. Receive ChatGPT response and parse for valid C code.
+// 4. Compile new light pattern.
+// 5. If the code does not compile, there is a function createNewPromptFromBadCode to use ChatGPT to amend such bad code
+// 6. Program the Arduino using the valid code from step 5/6.
 
 import (
 	"C"
@@ -48,7 +55,7 @@ var (
 	mciSendString = winmm.MustFindProc("mciSendStringW")
 )
 
-// This sets up response for key to complete voice prompt:
+// set up response for key to complete voice prompt:
 var reader = bufio.NewReader(os.Stdin)
 
 func readKey(input chan rune) {
@@ -69,8 +76,9 @@ func MCIWorker(lpstrCommand string, lpstrReturnString string, uReturnLength int,
 
 func makeInoFromResponse(str string) string {
 
-	// generate .ino arduino file from ChatGPT response
-	// first we parse for valid Ccode, then we save this text as a .iso
+	// function to generate .ino arduino file from ChatGPT response
+
+	// first we parse input for valid Ccode, then we save this text as a .ino
 
 	char := "#include" // assume this is first line of C
 
@@ -108,11 +116,13 @@ func makeInoFromResponse(str string) string {
 	}
 
 	return trimmedStr
-
 }
 
 func createNewPromptFromBadCode(trimmedStr string, duinoCompErr string) string {
-	errorchar := "error:" // C code is wrapped in this code identifier like md format
+	// function called when Arduino code doesn't compile
+	// it sends the compiler error message + "bad" code to chatGPT to get new code.
+
+	errorchar := "error:"
 
 	// now fine which line contains an error message::
 	errorMsg := ""
@@ -181,7 +191,7 @@ func main() {
 
 	log.Printf(" starting light-chat")
 
-	// setup optional command-line flags:
+	// optional command-line flags:
 	resetChat := flag.Bool("r", false, "reset chat history to xmas example")
 	textPromptFlag := flag.String("p", "mic", "use text or mic input to generate prompt")
 	noBoardFlag := flag.Bool("nb", false, "false if we want to run without connected board")
@@ -207,9 +217,8 @@ func main() {
 	}
 
 	if (runtime.GOOS == "windows") && (!*noBoardFlag) {
-		// find the USB COM port the duino is attached to
-		// NB this is not robust!! manually check using
-		// arduino-cli.exe board list
+		// find the USB COM port the duino is attached to:
+
 		boards, err := exec.Command("arduino-cli.exe", "board", "list").Output()
 		if err != nil {
 			log.Printf(" COM problem \n")
@@ -222,13 +231,13 @@ func main() {
 		charS := "Arduino"
 		index = strings.Index(boardsS, charS)
 
-		// check if a duino is connected:
+		// check if any duino is connected:
 		if index == -1 {
 			fmt.Printf("Error- Arduino not connected!\n", charS)
 			os.Exit(3)
 		}
 
-		// if so, check if it is a Uno type board:
+		// if so, check board type:
 		ifUno := strings.Index(boardsS, "Uno")
 
 		if ifUno == -1 {
@@ -250,13 +259,11 @@ func main() {
 	var duinoExamplePrompt []byte
 	var err error
 
-	//  load example duino code for prompt:
-
+	//  load example ("prototype") duino code for prompt:
 	if *resetChat {
 		log.Printf("reset flag used: using xmasTwinkleDuino.c")
 		// reset flag used- use the default c code as a reference for the prompt
 		duinoExamplePrompt, err = os.ReadFile("xmasTwinkleDuino.c")
-
 	} else {
 		// modify the existing light program:
 		duinoExamplePrompt, err = os.ReadFile("duinoCode//duinoCode.ino")
@@ -272,7 +279,6 @@ func main() {
 	duinoExamplePromptStr := string(duinoExamplePrompt)
 
 	// now setup ChatGPT-API connection:
-
 	secretAPI, err := os.ReadFile("..//..//chatgpt.txt") // load your secret chatgpt apiKey
 	if err != nil {
 		fmt.Print(err)
@@ -290,7 +296,6 @@ func main() {
 	ctx := context.Background()
 
 	if *textPromptFlag == "mic" {
-
 		// we are using speech input with the microphone
 		// only works on windows OS!
 
@@ -386,7 +391,6 @@ func main() {
 			return
 		}
 		fmt.Println(resp.Text)
-
 		newPrompt = resp.Text
 
 	} else {
@@ -458,6 +462,8 @@ func main() {
 	timeA := time.Now()
 	// look at https://pkg.go.dev/github.com/sashabaranov/go-openai@v1.17.9#section-readme
 
+	log.Printf(" sending chatGPT prompt")
+
 	resp2, err := client.CreateChatCompletion(context.Background(), req2)
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
@@ -474,7 +480,9 @@ func main() {
 	str = string(responseContent)
 
 	responseSn := newPrompt
-	responseSn = strings.Replace(responseSn, ".", "-", -1)
+	responseSn = strings.Replace(responseSn, ".", " ", -1)
+	responseSn = strings.Replace(responseSn, ":", "-", -1)
+
 	if len(responseSn) > 75 {
 		responseSn = responseSn[:75]
 	}
@@ -552,7 +560,6 @@ func main() {
 			if err != nil {
 				fmt.Printf("ChatCompletion error: %v\n", err)
 			}
-			// elapsed := timeA - time.Now()
 
 			elapsedTime := time.Now().Sub(timeA)
 
@@ -598,12 +605,10 @@ func main() {
 				// duinoCompErr := stderr.String()
 				os.Exit(3) // peace out
 			}
-
 			fmt.Println("new error-corrected code compiles!")
 
 		} else {
 			fmt.Println("code compiles!")
-
 		}
 
 		fmt.Println("program the board")
@@ -627,7 +632,5 @@ func main() {
 		}
 		fmt.Println("Result: " + out.String())
 		os.Exit(3) // peace out
-
 	}
-
 }

@@ -1,5 +1,6 @@
-Here is an example of C code for an Arduino using the FastLED library to create light patterns for an LED strip.  This is the existing pattern: 
- ``` 
+Here's an example of how you could program a "trip zone" LED pattern for Burning Man. The pattern will cycle through a variety of vibrant colors at a different speed.
+
+```
 #include <FastLED.h>
 
 #define LED_PIN     6  // do not change
@@ -35,13 +36,10 @@ void TripZone() {
     leds[i] = ColorFromPalette(palette, triwave8((i * 256 / NUM_LEDS) + millis() / 4));
   }
 }
+```
 
- ``` 
- Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. Please provide a response in C code. After the code please briefly explain the decision for your response. Here is the request: 
- make the motion of the existing pattern slower and a bit more random.
-	Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
-	2. Do not leave unimplemented code blocks in your response. 
-	3. The only allowed library is fastLED. Do not import or use any other library.
-	4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
-	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
-	
+This code uses the `CRGBPalette16` data type and the `PartyColors_p` palette (built into the FastLED library) to get an array of colorful, vibrant colors.
+
+We update the color of each LED every frame by indexing into this palette, using triwave functions to oscillate between different colors. The parameter to the `triwave8` function is chosen to create a waveform that repeats along the length of the LED strip.
+
+Please note the above code assumes a common anode LED, if your LED is common cathode, the color sequence may need to change. This code will create a dynamic, colorful "flow" effect along the strip that would be well-suited to a "trip zone" environment.
