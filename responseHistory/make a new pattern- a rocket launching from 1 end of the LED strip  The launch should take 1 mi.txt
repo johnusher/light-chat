@@ -1,0 +1,45 @@
+Here is the modified code to create a rocket launch pattern, where the rocket launch is simulated starting from one end of the LED strip and gradually lights up each LED in sequence until the other end of the strip is reached. It is assumed that one minute is equivalent to 60 frames, so the time to move from one LED to the next LED is calculated accordingly.
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 1  // For smooth transition in 1 minute
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  RocketLaunch();
+  
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void RocketLaunch() {
+  static unsigned int frame = 0;
+
+  int led_index = frame / 2;  // Determine current LED index depending on frame
+
+  for(int i = 0; i < NUM_LEDS; ++i) {
+     if(i <= led_index) 
+        leds[i] = CRGB::White;
+     else 
+        leds[i] = CRGB::Black;
+  }
+
+  if(++frame > (NUM_LEDS * 2)) frame = 0;  // Reset frame after reaching end of LED strip. Multiply by 2 for a full minute.
+}
+```
+
+The above code creates a pattern where the LEDs light up in sequence simulating a rocket's launch, it takes 1 minute (60 seconds or 60 frames at 1 frame per second) for the rocket to reach from one end to the other. The "RocketLaunch" function determines the indexed LED to light up based on the current frame and resets the frame count after reaching the end of the LED strip. It is assumed that the time taken to move from one led to the next is equivalent to 2 seconds, adjusting this value will change the speed of the rocket. The remaining LEDs after the 'rocket' are set to 'Black' to simulate that the 'rocket' has moved past them.

@@ -1,0 +1,55 @@
+Here is the new code block:
+
+```C
+#include <FastLED.h>
+
+#define LED_PIN     6  
+#define COLOR_ORDER GRB  
+#define CHIPSET     WS2812B   
+#define NUM_LEDS    30
+#define BRIGHTNESS  150    
+#define FRAMES_PER_SECOND 30
+
+CRGB leds[NUM_LEDS];
+
+int ballPosition = 0;
+int ballDirection = 1;
+int player1Position = 0;
+int player2Position = NUM_LEDS - 1;
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  TennisGame(); 
+  
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void TennisGame() {
+  // Clear the board (all LEDs black)
+  FastLED.clear();
+
+  // Update the ball position
+  ballPosition += ballDirection;
+
+  // Bounce the ball off the ends (players)
+  if (ballPosition == player1Position || ballPosition == player2Position) {
+    ballDirection *= -1; // reverse direction
+  }
+
+  // Ensure ball stays within LED strip
+  ballPosition = constrain(ballPosition, 0, NUM_LEDS - 1);
+
+  // Color the LEDs
+  leds[ballPosition] = CRGB::Red; // The ball is red
+  leds[player1Position] = CRGB::Green; // Player 1 is green
+  leds[player2Position] = CRGB::Blue; // Player 2 is blue
+}
+```
+
+In the new implementation, the animation of a game of tennis simulates a ball bouncing between two players, represented by green and blue LEDs located at either end of the LED strip. The players remain statically placed. The ball, represented by a red LED, reverses direction each time it reaches a player, creating a 1-dimensional pong-like game. The ball's position is constrained to remain within the bounds of the defined LED strip.

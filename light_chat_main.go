@@ -483,8 +483,8 @@ func main() {
 	responseSn = strings.Replace(responseSn, ".", " ", -1)
 	responseSn = strings.Replace(responseSn, ":", "-", -1)
 
-	if len(responseSn) > 75 {
-		responseSn = responseSn[:75]
+	if len(responseSn) > 95 {
+		responseSn = responseSn[:95]
 	}
 	responseSn = responseSn + ".txt"
 	responseSn = "responseHistory" + "//" + responseSn
