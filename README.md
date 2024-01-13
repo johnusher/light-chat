@@ -78,7 +78,25 @@ The C code did not compile first time- it used an undefined parameter HALF. But 
 
 The function ```createNewPromptFromBadCode``` uses ChatGPT to modify such non-compilable "bad" code: the function takes the error message from the Arduino compiler and sends this to ChatGPT with the "bad" code, and asks it to correct the bad code so it compiles. If we again get "bad" code, we abort.
 
+### 4. Light strip in a ring
+
+```
+go run .\light_chat_main.go -r 
+-p "make a new pattern. 
+imagine the LED strip is configured in a ring.
+ make a  single led dot go round and round the ring, getting faster, and changing colours over the colours of the rainbow. 
+ the dot should go round 8 times and be very fast on the final lap.
+  there should only be 1 led active at a time. the led should appear to go round the ring of LEDs."
+  ```
+
+  [![Watch the video]![Alt text](https://img.youtube.com/vi/F9zeAdzx710/0.jpg)](https://youtu.be/F9zeAdzx710
+)
+
+[Response](<responseHistory/make a new pattern  imagine the LED strip is configured in a ring  make a  single led dot go ro.txt>)
+
+
 ### 4.20.
+
  ```bash 
  go run .\light_chat_main.go -p "Make the colours suitable for a party at 420 wink-wink nudge-nudge say no more" -nb -r 
  ```

@@ -1,0 +1,76 @@
+The request is to generate a "happy horsey" effect. But it seems impossible to create a complex pattern like that using a simple 1-dimensional LED strip. Even if one tries to put LEDs in a pattern similar to a horse, it will still miss details due to the absence of resolution as compared to a pixelated screen.
+
+In a 1-dimensional LED strip, there's no way to display the shape of the horse. Different colors in a 1-D array will only indicate a sequence, which doesn't suit the request of a horsey pattern.
+
+Due to the restrictions of the original request, flashing all LEDs red twice and then displaying the existing pattern seems to be the most appropriate route. Here is the modified code:
+
+```c
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 5
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  FlashRed(); // flash all LEDs red twice
+  delay(1000);
+  ChristmasLights(); // display normal pattern
+  
+  FastLED.show();
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void FlashRed() {
+  for (int i=0; i<NUM_LEDS; i++) {
+    leds[i] = CRGB::Red;
+  }
+  FastLED.show();
+  delay(500);
+  
+  for (int i=0; i<NUM_LEDS; i++) {
+    leds[i] = CRGB::Black;
+  }
+  FastLED.show();
+  delay(500);
+  
+  for (int i=0; i<NUM_LEDS; i++) {
+    leds[i] = CRGB::Red;
+  }
+  FastLED.show();
+  delay(500);
+ 
+  for (int i=0; i<NUM_LEDS; i++) {
+    leds[i] = CRGB::Black;
+  }
+  FastLED.show();
+  delay(500);
+}
+
+void ChristmasLights() {
+  for (int i = 0; i < NUM_LEDS; i += 3) {
+    leds[i] = CRGB::Red; 
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Green;
+    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB::White;
+  }
+  
+  int brightness = 64;
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 50) {
+      leds[j] = CRGB::Black;
+    }
+  }
+}
+```
+
+This code will create a twice red flashing effect before returning to the original ChristmasLights effect. The FlashRed function turns all LEDs red, then turns them off (flashes red), then repeats the process one more time, satisfying the "twice" request.

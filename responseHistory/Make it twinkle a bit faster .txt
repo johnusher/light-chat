@@ -1,0 +1,48 @@
+```
+#include <FastLED.h>
+
+#define LED_PIN     6  
+#define COLOR_ORDER GRB  
+#define CHIPSET     WS2812B   
+#define NUM_LEDS    30  
+#define BRIGHTNESS  150    
+#define FRAMES_PER_SECOND 10   
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  
+}
+
+void loop() {
+  DecoratedChristmasTree(); // run simulation frame
+  
+  FastLED.show(); 
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void DecoratedChristmasTree() {
+    for(int i = 0; i < NUM_LEDS; i++) {
+      if(i % 2 == 0){
+          leds[i] = CRGB::Green;
+      }else{
+          leds[i] = CRGB::Black;
+      }
+    }
+
+    int twinkling_indicator = random8();
+    if (twinkling_indicator < 50) { 
+      leds[7] = CRGB::White;
+      leds[22] = CRGB::Red;
+      leds[14] = CRGB::Yellow;
+    }
+}
+```
+
+Explanation : 
+
+To make the LEDs twinkle faster, I increased the frames per second in the definition `FRAMES_PER_SECOND` to `10`. This causes the twinkling or blinking of LEDs to update ten times every second instead of once, effectively increasing the twinkle speed. The `FastLED.delay(1000 / FRAMES_PER_SECOND)` function call in the `loop()` function uses `FRAMES_PER_SECOND` to determine how long to pause between frames. Increasing `FRAMES_PER_SECOND` decreases this delay, speeding up the twinkling effect. 
+
+Remember that the maximum variety of `FRAMES_PER_SECOND` is dependent on your hardware and the length of your LED strip, and making it too high could result in problems. You might also need to adjust the threshold in the twinkling routine for optimal results depending on your specific LED strip and its light diffusion conditions.

@@ -1,0 +1,47 @@
+Sure, here is the C code for an Arduino using the FastLED library to create a Pac-Man game effect on an LED strip.
+
+```C
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 5
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  pacmanGame();  // run simulation frame
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void pacmanGame() {
+  // Start with all LEDs black
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Black;
+  }
+
+  // Create Pac-Man
+  leds[0] = CRGB::Yellow;
+
+  // Create walls
+  for(int i = 4; i < 8; i++) {
+    leds[i] = CRGB::Blue;
+  }
+
+  // Create ghosts
+  leds[10] = CRGB::Red;
+  leds[14] = CRGB::Magenta;
+}
+```
+Take notice that creating a visual representation of the Pac-Man game on an LED strip is understandably subjective. The 'Pac-Man' is represented as a single yellow LED at the start of the strip. 'Walls' are a block of blue LEDs, and 'Ghosts' are individual LEDs scattered around represented by different colors. Mention that due to the limitations of an LED strip, it is not possible to create a full, detailed Pac-Man game representation - this is a very simplified interpretation.
+The effect is static and does not animate a game of Pac-Man in progress. If you want a moving Pac-Man and ghosts effect, the code will need to be significantly more complex and realizing this in a meaningful way on a one-dimensional LED strip could still be out of reach.

@@ -425,7 +425,6 @@ func main() {
 	2. Do not leave unimplemented code blocks in your response. 
 	3. The only allowed library is fastLED. Do not import or use any other library.
 	4. If you are not sure what value to use, just use your best judge. Do not use None for anything.
-	5. Only if you can not provide a valid response, please flash all LEDs red twice (do this just once) and then display the existing pattern.
 	`
 	newPromptStr = promptIntro + duinoExamplePromptStr + duinoExamplePromptStr2 + duinoExamplePromptStr3 + newPrompt + duinoExamplePromptStrFinal
 

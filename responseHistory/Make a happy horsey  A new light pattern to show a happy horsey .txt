@@ -1,0 +1,49 @@
+Creating a 'Happy Horsey' pattern might be subjective, but let's assume it consists of a primary colour like blue (for the body of the horse) and secondary colours like white and green (for motion or happiness). I'm imagining something like a blue-LED horse that seems to be 'running' by having white/green LEDs run through it.
+
+Here is the modified C code:
+
+```C
+#include <FastLED.h>
+
+#define LED_PIN     6
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2812B
+#define NUM_LEDS    30
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 5
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  HappyHorsey(); // run simulation frame
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+} 
+
+void HappyHorsey() {
+  static uint8_t startIndex = 0;
+  
+  // base colour is blue
+  fill_solid(leds, NUM_LEDS, CRGB::Blue);
+  
+  // running colours are green and white
+  for(int i=0; i<NUM_LEDS; i++) {
+    leds[(i+startIndex) % NUM_LEDS] = CRGB::Green;
+    leds[(i+startIndex+1) % NUM_LEDS] = CRGB::White;
+  }
+  
+  if (++startIndex > NUM_LEDS) {
+    startIndex = 0;
+  }
+}
+```
+
+Explanation: This code fills the LED strip with blue LEDs, representing the 'horse'. After that, it will make green and white 'running lights' that represent the motion of the 'happy horsey'. The 'running lights' starts from the first LED and travels along the strip in a circle, creating a 'running' visual effect.
+
+Please note that the visual representation might not literally look like a horse, as it's hard to represent a horse using a linear strip of LEDs. However, this should give an interesting lighting effect that could be considered as a 'Happy Horsey'.

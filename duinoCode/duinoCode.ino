@@ -1,61 +1,33 @@
 #include <FastLED.h>
 
-#define LED_PIN     6  // do not change
-#define COLOR_ORDER GRB  // do not change
-#define CHIPSET     WS2812B   // LED chipset. do not change
-#define NUM_LEDS    30  // number of LEDs in the LED strip. do not change this value.
-#define BRIGHTNESS  150   // set brightness of all LEDs. 150 is default
-#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
+#define LED_PIN     6  
+#define COLOR_ORDER GRB  
+#define CHIPSET     WS2812B 
+#define NUM_LEDS    30  
+#define BRIGHTNESS  150
+#define FRAMES_PER_SECOND 60
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(1000); // delay before we start
+  delay(1000);
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
-  for(int i=0; i<NUM_LEDS; i++){
-    leds[i] = CRGB::Red;
-  }
-  FastLED.show();
-  FastLED.delay(500);
-
-  for(int i=0; i<NUM_LEDS; i++){
-    leds[i] = CRGB::Black;
-  }
-  FastLED.show();
-  FastLED.delay(500);
-
-  for(int i=0; i<NUM_LEDS; i++){
-    leds[i] = CRGB::Red;
-  }
-  FastLED.show();
+  FastLED.setBrightness(BRIGHTNESS); 
+  FastLED.clear();
 }
 
 void loop() {
-  for(int i=0; i<NUM_LEDS; i++){
-    leds[i] = CRGB::Black;
-  }
-  FastLED.show();
-  FastLED.delay(500);
-
-  ChristmasLights();
-
-  FastLED.show();
-  FastLED.delay(1000 / FRAMES_PER_SECOND);
+  RainbowCircle();
 }
 
-void ChristmasLights() {
-
-  for (int i = 0; i < NUM_LEDS; i += 3) {
-    leds[i] = CRGB::Red; 
-    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Green;
-    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB::White;
-  }
-
-  int brightness = 64;
-  for (int j = 0; j < NUM_LEDS; j++) {
-    if (random8() < 50) {
-      leds[j] = CRGB::Black;
+void RainbowCircle() {
+  for (int lap = 0; lap < 8; lap++) {
+    int speed = 5 + 20 * lap;  
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(i * 256.0 / NUM_LEDS + lap * 256.0 / 8, 255, 255); 
+      FastLED.show();
+      FastLED.clear();
+      delay(1000 / speed); 
     }
   }
 }

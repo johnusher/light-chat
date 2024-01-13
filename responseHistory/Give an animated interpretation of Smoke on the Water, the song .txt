@@ -1,0 +1,45 @@
+```
+#include <FastLED.h>
+
+#define LED_PIN     6  // do not change
+#define COLOR_ORDER GRB  // do not change
+#define CHIPSET     WS2812B  // do not change
+#define NUM_LEDS    30  // do not change
+
+#define BRIGHTNESS  150  // set brightness of all LEDs
+#define FRAMES_PER_SECOND 5  // do not change this value
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+}
+
+void loop() {
+  SmokeOnTheWater(); // run simulation frame
+  
+  FastLED.show(); 
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void SmokeOnTheWater() {
+  // Fill the LEDs with a repeating pattern of smoke(blue), fire(orange) and water(white) to depict the song
+  for (int i = 0; i < NUM_LEDS; i += 3) {
+    leds[i] = CRGB::Blue; // Smoking effect
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::Orange; // The fire effect
+    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB::Aqua; // The water effect
+  }
+
+  // Optional: Add a flickering effect
+  int brightness = 64;
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 50) { // adjust the probability to control flickering
+      leds[j] = CRGB::Black; // 'turn off' the LED randomly
+    }
+  }
+}
+```
+
+This code follows the same setup and basic loop structures as the given pattern. In the "SmokeOnTheWater" function, a repeated pattern of Blue, Orange, and Aqua-color LEDs is created to represent the "Smoke", "Fire", and "Water" of the song's title and theme. The program then goes through each LED and randomly turns some of them off to emulate the flickering effect of fire, which complements the song's theme as well.

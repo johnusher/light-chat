@@ -1,0 +1,53 @@
+```
+#include <FastLED.h>
+
+#define LED_PIN     6  
+#define COLOR_ORDER GRB  
+#define CHIPSET     WS2812B   
+#define NUM_LEDS    30  
+#define BRIGHTNESS  150    
+#define FRAMES_PER_SECOND 1   
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  
+}
+
+void loop() {
+  DecoratedChristmasTree(); // run simulation frame
+  
+  FastLED.show(); 
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void DecoratedChristmasTree() {
+    for(int i = 0; i < NUM_LEDS; i++) {
+      if(i % 2 == 0){
+          leds[i] = CRGB::Green;
+      }else{
+          leds[i] = CRGB::Black;
+      }
+    }
+
+    int twinkling_indicator = random8();
+    if (twinkling_indicator < 50) { 
+      leds[7] = CRGB::White;
+      leds[22] = CRGB::Red;
+      leds[14] = CRGB::Yellow;
+    }
+}
+```
+Explanation: 
+
+The DecoratedChristmasTree function first sets every other LED to green, representing the spaces between the Christmas tree branches, and the remaining LEDs are turned off (black) to represent the tree branches.
+
+Next, we randomly pick three points on the tree (the LED strip) to represent Christmas lights or decorations with different colors, creating a sense of decoration on the tree if the random number is less than 50 (you can adjust this threshold to influence the frequency of the decorations' appearance). 
+
+If you want to see more decorations appear on the tree, or fewer, you can adjust the twinkling_indicator's threshold value. 
+
+Note: 
+
+In the real-world implementation, the positions and colors of decorations on the tree should ideally be randomized instead of being static for a more lively effect. For this example's purpose, it's simplified to illustrate the concept.

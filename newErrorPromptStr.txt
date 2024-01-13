@@ -7,34 +7,57 @@ Here is some C code for an Arduino using the FastLED library to create light pat
 #define CHIPSET     WS2812B
 #define NUM_LEDS    30
 
-#define BRIGHTNESS  150
-#define FRAMES_PER_SECOND 120
+#define BRIGHTNESS  150    
+#define FRAMES_PER_SECOND 240   
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
   delay(1000);
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(BRIGHTNESS); 
 }
 
 void loop() {
-  TripZone();
-  
+  ledRainbowCycle();
   FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void TripZone() {
+void ledRainbowCycle() {
+  static int16_t cycle_count = 0;
+  static uint8_t led_index = 0;
   static uint8_t hue = 0;
-  for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CHSV(hue++, 255, 255);
+
+  leds[led_index] = CHSV(hue, 255, 255);  // Color the led
+
+  // Pause on the first led
+  if (led_index == 0 && cycle_count < 8 * NUM_LEDS) {
+    delay(1000);
   }
+
+  // Move to next led
+  if (++led_index >= NUM_LEDS) {
+    led_index = 0;
+
+    // Change color
+    hue += 16;
+
+    // Increase speed
+    if (++cycle_count >= 8 * NUM_LEDS) {
+      BRIGHTNESS *= 2;
+      FRAMES_PER_SECOND *= 2;
+      cycle_count = 0;
+    }
+  }
+  
+  // Delay to see the moving dot
+  delay(1000 / (FRAMES_PER_SECOND + cycle_count / NUM_LEDS));
 }
 
  ``` 
- The code does not compile. The compiler creates the following  error messages: 
-- redefinition of 'CRGB leds [30]'- redefinition of 'void setup()'- redefinition of 'void loop()'
+ The code does not compile. The compiler creates the following  error messages: 
+- lvalue required as left operand of assignment- lvalue required as left operand of assignment
  Please use this error message to modify the provided code so the modified code compiles. Please provide a response in C code. After the code please briefly explain the decision for your response.  
  
 Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.

@@ -1,0 +1,49 @@
+Here is the code following your request:
+
+```cpp
+#include <FastLED.h>
+
+#define LED_PIN     6  
+#define COLOR_ORDER GRB 
+#define CHIPSET     WS2812B   
+#define NUM_LEDS    30  
+#define PACMAN_LEDS 5   // Number of LEDs for Pac-Man
+#define FOOD_LEDS   1   // Number of LEDs for the edible dots
+
+#define BRIGHTNESS  255  
+#define FRAMES_PER_SECOND 10  
+#define PACMAN_COLOR CRGB::Yellow
+#define FOOD_COLOR   CRGB::White
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS); 
+}
+
+void loop() {
+  Pacman(); 
+  FastLED.show(); 
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void Pacman() {
+  // Move Pac-Man along the strip by updating the colors
+  for (int i = 0; i < NUM_LEDS; i++) {
+    // Clear all LEDs
+    leds[i] = CRGB::Black;
+    // Add Pac-Man
+    if(i < NUM_LEDS - PACMAN_LEDS) 
+      for (int j = 0; j < PACMAN_LEDS; j++) 
+        leds[i+j] = PACMAN_COLOR;
+    // Add food in front of Pac-Man
+    if (i <= NUM_LEDS - PACMAN_LEDS - FOOD_LEDS) 
+      leds[i+PACMAN_LEDS] = FOOD_COLOR;
+  }
+}
+```
+The Code explains the concept of a Pac-Man light chase. The Pac-Man is shown as a group of 5 LEDs in yellow, and the food he eats is shown as additional LED in white color. Then it moves the Pac-Man and food along the LED stripby updating the color of the individual LEDs.
+
+As usual, at first it clears all LEDs to the color black (which means off). Then it draws the Pac-Man and its food using the respective colors. It repeats this step moving the beginning of Pac-Man one LED further each time while adding the food always in front of the Pac-Man. At the end of the strip, it again begins from the start as no constraints were given in the task. 
