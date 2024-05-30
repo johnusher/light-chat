@@ -45,7 +45,7 @@ void ChristmasLights() {
 }
  ``` 
  Please generate new C code to satisfy the following request and output the modified code in its entirety beginning with #include <FastLED.h> and include the line: #define COLOR_ORDER GRB. Please provide a response in C code. After the code please briefly explain the decision for your response. Here is the request: 
- make a new pattern. imagine the LED strip is configured in a ring. make a  single led dot go round and roud the ring, getting faster, and changing colours over the colours of the rainbow. the dot should go round 8 times and be very fast on the final lap. there should only be 1 led active at a time. the led should appear to go round the ring of LEDs.
+ Make a light pattern showing Barbie's dream house.
 	Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
 	2. Do not leave unimplemented code blocks in your response. 
 	3. The only allowed library is fastLED. Do not import or use any other library.

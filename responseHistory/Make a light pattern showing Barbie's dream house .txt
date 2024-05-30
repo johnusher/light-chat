@@ -1,0 +1,48 @@
+```
+#include <FastLED.h>
+
+#define LED_PIN     6  // do not change
+#define COLOR_ORDER GRB  // do not change
+#define CHIPSET     WS2812B   // LED chipset. do not change
+#define NUM_LEDS    30  // length of the light strip, also known as lightstrip and LED strip or LEDstrip. 
+                        // NUM_LEDS is the number of LEDs in the LED strip. do not change this value.
+#define BRIGHTNESS  150    // set brightness of all LEDs. 150 is default
+#define FRAMES_PER_SECOND 5   // 20 is very fast, 10 is normal, 5 is slow. Above 30 is too fast.
+
+CRGB leds[NUM_LEDS];
+
+void setup() {
+  delay(1000); // delay before we start - delay units are milliseconds
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  // set brightness of all LEDs
+}
+
+void loop() {
+  BarbieDreamHouse(); // run simulation frame
+  
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+}
+
+void BarbieDreamHouse() {
+  // Fill the LEDs with a vibrant pattern of pink, purple, and sky blue
+  for (int i = 0; i < NUM_LEDS; i += 3) {
+    leds[i] = CRGB::DeepPink; 
+    if (i + 1 < NUM_LEDS) leds[i + 1] = CRGB::MediumOrchid;
+    if (i + 2 < NUM_LEDS) leds[i + 2] = CRGB::SkyBlue;
+  }
+
+  // Optional: Add a sparkling twinkling effect to give a dreamy look
+  for (int j = 0; j < NUM_LEDS; j++) {
+    if (random8() < 50) { // adjust the probability to control twinkling
+      leds[j].fadeToBlackBy(200); // fade out the LED randomly to create a sparkling effect
+    }
+  }
+}
+```
+
+**Explanation:**
+- Replaced the Christmas colors (red, green, white) with colors that give a vibe of "Barbie's dream house" — DeepPink, MediumOrchid, and SkyBlue.
+- Added a sparkling twinkling effect by randomly fading out the LEDs to create a dreamy look.
+- Kept the structure and format similar to the provided Christmas pattern, ensuring consistency and simplicity in understanding the changes.
+- The decision for the color scheme is based on the common representation and association of Barbie with vibrant pink and related dreamy colors.

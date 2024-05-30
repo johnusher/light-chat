@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/go-resty/resty/v2 v2.10.0
 	github.com/nsf/termbox-go v1.1.1
-	github.com/sashabaranov/go-openai v1.24.1
+	github.com/sashabaranov/go-openai v1.17.9
 	github.com/sirupsen/logrus v1.9.3
 )
 

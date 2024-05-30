@@ -2,62 +2,43 @@ Here is some C code for an Arduino using the FastLED library to create light pat
  ``` 
 #include <FastLED.h>
 
-#define LED_PIN     6
-#define COLOR_ORDER GRB
-#define CHIPSET     WS2812B
-#define NUM_LEDS    30
-
-#define BRIGHTNESS  150    
-#define FRAMES_PER_SECOND 240   
+#define LED_PIN         6
+#define COLOR_ORDER     GRB
+#define CHIPSET         WS2812B
+#define NUM_LEDS        30
+#define BRIGHTNESS      150
+#define FRAMES_PER_SECOND 100 
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
-  delay(1000);
-  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS); 
+  delay(1000); 
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
-  ledRainbowCycle();
-  FastLED.show();
+  AquariusEffect();
+
+  FastLED.show(HALF);
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-void ledRainbowCycle() {
-  static int16_t cycle_count = 0;
-  static uint8_t led_index = 0;
-  static uint8_t hue = 0;
+void AquariusEffect() {
+  static uint8_t brightness = 0;
 
-  leds[led_index] = CHSV(hue, 255, 255);  // Color the led
+  fill_solid(leds, NUM_LEDS, CRGB::White);
+  fadeToBlackBy(leds, NUM_LEDS, brightness);
+  brightness++;  
 
-  // Pause on the first led
-  if (led_index == 0 && cycle_count < 8 * NUM_LEDS) {
-    delay(1000);
-  }
-
-  // Move to next led
-  if (++led_index >= NUM_LEDS) {
-    led_index = 0;
-
-    // Change color
-    hue += 16;
-
-    // Increase speed
-    if (++cycle_count >= 8 * NUM_LEDS) {
-      BRIGHTNESS *= 2;
-      FRAMES_PER_SECOND *= 2;
-      cycle_count = 0;
-    }
-  }
-  
-  // Delay to see the moving dot
-  delay(1000 / (FRAMES_PER_SECOND + cycle_count / NUM_LEDS));
+  if (brightness == 255) {
+    brightness = 0;  
+  } 
 }
 
  ``` 
- The code does not compile. The compiler creates the following  error messages: 
-- lvalue required as left operand of assignment- lvalue required as left operand of assignment
+ The code does not compile. The compiler creates the following error message:
+- 'HALF' was not declared in this scope
  Please use this error message to modify the provided code so the modified code compiles. Please provide a response in C code. After the code please briefly explain the decision for your response.  
  
 Remember: 1. Always format the code in code blocks. Begin and end the new C code with the code block symbol of 3 backticks.
